@@ -39,12 +39,12 @@ const ProductCard = ({ product, pageType }) => {
                height={25}
             />
             <span className="text-white">{product.name}</span>
-            <span className="text-xs text-gray-500">
+            {/* <span className="text-xs text-gray-500">
                {product.isInCart ? "Dans le panier" : "À acheter"}
             </span>
             <span className="text-xs text-gray-500">
                {product.isToBuy ? "Liste" : "Inventaire"}
-            </span>
+            </span> */}
          </div>
          <span className="">
             <div className="flex items-center gap-1.5">
