@@ -5,7 +5,9 @@ export function middleware(request) {
    const isAuthPage =
       request.nextUrl.pathname.startsWith("/login") ||
       request.nextUrl.pathname.startsWith("/register");
-   const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
+   const isProtectedRoute =
+      request.nextUrl.pathname.startsWith("/dashboard") ||
+      request.nextUrl.pathname.startsWith("/shopping-list");
 
    const isAuthenticated = userCookie && userCookie.value;
 
@@ -21,5 +23,10 @@ export function middleware(request) {
 }
 
 export const config = {
-   matcher: ["/dashboard/:path*", "/login", "/register"],
+   matcher: [
+      "/dashboard/:path*",
+      "/login",
+      "/register",
+      "/shopping-list/:path*",
+   ],
 };

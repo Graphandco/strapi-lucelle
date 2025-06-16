@@ -16,12 +16,20 @@ export default function Header() {
 
                <div className="flex items-center gap-4">
                   {user ? (
-                     <Link
-                        href="/dashboard"
-                        className="text-gray-600 hover:text-gray-900"
-                     >
-                        Dashboard
-                     </Link>
+                     <>
+                        <Link
+                           href="/dashboard"
+                           className="text-gray-600 hover:text-gray-900"
+                        >
+                           Dashboard
+                        </Link>
+                        <Link
+                           href="/shopping-list"
+                           className="text-gray-600 hover:text-gray-900"
+                        >
+                           Shopping List
+                        </Link>
+                     </>
                   ) : (
                      <Link
                         href="/login"
