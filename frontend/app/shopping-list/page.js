@@ -1,12 +1,12 @@
 "use client";
 
 import { getCategories } from "@/actions/categories";
-import { ProductProvider, useProducts } from "@/contexts/ProductContext";
+import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/ProductCard";
 import { useEffect, useState } from "react";
 
-function ShoppingListContent() {
-   const { products, loading } = useProducts();
+export default function ShoppingList() {
+   const { allProducts, loading } = useProducts();
    const [categories, setCategories] = useState([]);
 
    useEffect(() => {
@@ -17,12 +17,14 @@ function ShoppingListContent() {
       loadCategories();
    }, []);
 
+   // Filtrer les produits qui sont à acheter
+   const productsToBuy = allProducts.filter((product) => product.isToBuy);
    // Filtrer les produits non dans le panier
-   const productsNotInCartFiltered = products.filter(
+   const productsNotInCartFiltered = productsToBuy.filter(
       (product) => !product.isInCart
    );
    // Filtrer les produits dans le panier
-   const productsInCartFiltered = products.filter(
+   const productsInCartFiltered = productsToBuy.filter(
       (product) => product.isInCart
    );
 
@@ -53,6 +55,7 @@ function ShoppingListContent() {
                               <ProductCard
                                  key={product.documentId}
                                  product={product}
+                                 pageType="shopping-list"
                               />
                            ))}
                         </ul>
@@ -70,6 +73,7 @@ function ShoppingListContent() {
                         <ProductCard
                            key={product.documentId}
                            product={product}
+                           pageType="shopping-list"
                         />
                      ))}
                   </ul>
@@ -77,13 +81,5 @@ function ShoppingListContent() {
             )}
          </div>
       </div>
-   );
-}
-
-export default function ShoppingList() {
-   return (
-      <ProductProvider>
-         <ShoppingListContent />
-      </ProductProvider>
    );
 }

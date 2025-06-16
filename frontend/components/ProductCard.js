@@ -4,9 +4,9 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, pageType }) => {
    const { user } = useAuth();
-   const { updateProductStatus } = useProducts();
+   const { updateProductInCart, updateProductToBuy } = useProducts();
    const productImage = product.image?.formats?.thumbnail?.url
       ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${product.image.formats.thumbnail.url}`
       : null;
@@ -16,11 +16,19 @@ const ProductCard = ({ product }) => {
          className="bg-card flex items-center justify-between rounded-xl py-3 px-5 cursor-pointer hover:bg-card/80 transition-colors"
          onClick={async () => {
             if (!user?.jwt) return;
-            await updateProductStatus(
-               product.documentId,
-               product.isInCart,
-               user.jwt
-            );
+            if (pageType === "shopping-list") {
+               await updateProductInCart(
+                  product.documentId,
+                  product.isInCart,
+                  user.jwt
+               );
+            } else {
+               await updateProductToBuy(
+                  product.documentId,
+                  product.isToBuy,
+                  user.jwt
+               );
+            }
          }}
       >
          <div className="flex items-center gap-4">
@@ -31,6 +39,12 @@ const ProductCard = ({ product }) => {
                height={25}
             />
             <span className="text-white">{product.name}</span>
+            <span className="text-xs text-gray-500">
+               {product.isInCart ? "Dans le panier" : "À acheter"}
+            </span>
+            <span className="text-xs text-gray-500">
+               {product.isToBuy ? "Liste" : "Inventaire"}
+            </span>
          </div>
          <span className="">
             <div className="flex items-center gap-1.5">

@@ -8,7 +8,7 @@ export default function Header() {
 
    return (
       <header className="shadow-sm">
-         <div className="wrapper py-4">
+         <div className="container py-4">
             <nav className="flex items-center justify-between">
                <Link href="/" className="text-xl font-bold">
                   Next-Strapi Auth

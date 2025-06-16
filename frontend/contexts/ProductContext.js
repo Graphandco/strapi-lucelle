@@ -1,23 +1,23 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { getStrapiProductsToBuy } from "@/actions/getProducts";
+import { getStrapiProducts } from "@/actions/getProducts";
 
 const ProductContext = createContext();
 
 export function ProductProvider({ children }) {
-   const [products, setProducts] = useState([]);
+   const [allProducts, setAllProducts] = useState([]);
    const [loading, setLoading] = useState(true);
 
    // Charger les produits au montage du composant
    useEffect(() => {
-      loadProducts();
+      loadAllProducts();
    }, []);
 
-   const loadProducts = async () => {
+   const loadAllProducts = async () => {
       try {
-         const data = await getStrapiProductsToBuy("products");
-         setProducts(data);
+         const data = await getStrapiProducts("products");
+         setAllProducts(data);
       } catch (error) {
          console.error("Error loading products:", error);
       } finally {
@@ -25,10 +25,10 @@ export function ProductProvider({ children }) {
       }
    };
 
-   const updateProductStatus = async (productId, currentStatus, token) => {
+   const updateProductInCart = async (productId, currentStatus, token) => {
       try {
          // Mise à jour optimiste de l'UI
-         setProducts((prevProducts) =>
+         setAllProducts((prevProducts) =>
             prevProducts.map((product) =>
                product.documentId === productId
                   ? { ...product, isInCart: !currentStatus }
@@ -55,26 +55,72 @@ export function ProductProvider({ children }) {
 
          if (!response.ok) {
             // En cas d'erreur, on revient à l'état précédent
-            setProducts((prevProducts) =>
+            setAllProducts((prevProducts) =>
                prevProducts.map((product) =>
                   product.documentId === productId
                      ? { ...product, isInCart: currentStatus }
                      : product
                )
             );
-            throw new Error("Failed to update product");
+            throw new Error("Failed to update product in cart");
          }
       } catch (error) {
-         console.error("Error updating product:", error);
+         console.error("Error updating product in cart:", error);
+         throw error;
+      }
+   };
+
+   const updateProductToBuy = async (productId, currentStatus, token) => {
+      try {
+         // Mise à jour optimiste de l'UI
+         setAllProducts((prevProducts) =>
+            prevProducts.map((product) =>
+               product.documentId === productId
+                  ? { ...product, isToBuy: !currentStatus }
+                  : product
+            )
+         );
+
+         // Mise à jour dans Strapi
+         const response = await fetch(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
+            {
+               method: "PUT",
+               headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+               },
+               body: JSON.stringify({
+                  data: {
+                     isToBuy: !currentStatus,
+                  },
+               }),
+            }
+         );
+
+         if (!response.ok) {
+            // En cas d'erreur, on revient à l'état précédent
+            setAllProducts((prevProducts) =>
+               prevProducts.map((product) =>
+                  product.documentId === productId
+                     ? { ...product, isToBuy: currentStatus }
+                     : product
+               )
+            );
+            throw new Error("Failed to update product to buy status");
+         }
+      } catch (error) {
+         console.error("Error updating product to buy status:", error);
          throw error;
       }
    };
 
    const value = {
-      products,
+      allProducts,
       loading,
-      updateProductStatus,
-      refreshProducts: loadProducts,
+      updateProductInCart,
+      updateProductToBuy,
+      refreshProducts: loadAllProducts,
    };
 
    return (

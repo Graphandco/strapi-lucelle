@@ -1,14 +1,15 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
-import Header from "@/components/Header";
+import { ProductProvider } from "@/contexts/ProductContext";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-   title: "Next.js + Strapi Auth",
-   description: "Authentication with Next.js and Strapi",
+   title: "Graph and Co",
+   description: "Application de gestion de courses",
 };
 
 export default function RootLayout({ children }) {
@@ -16,11 +17,13 @@ export default function RootLayout({ children }) {
       <html lang="fr">
          <body className={inter.className}>
             <AuthProvider>
-               <div className="container">
+               <ProductProvider>
                   <Header />
-                  <main>{children}</main>
-               </div>
-               <Footer />
+                  <main className="min-h-screen container pb-20">
+                     {children}
+                  </main>
+                  <Footer />
+               </ProductProvider>
             </AuthProvider>
          </body>
       </html>
