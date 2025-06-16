@@ -1,14 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { addProduct } from "@/actions/addProduct";
 import { getCategories } from "@/actions/categories";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProducts, ProductProvider } from "@/contexts/ProductContext";
 
-export default function AddProduct() {
+function AddProductContent() {
    const router = useRouter();
    const { user } = useAuth();
+   const { refreshProducts } = useProducts();
    const [error, setError] = useState("");
    const [loading, setLoading] = useState(false);
    const [categories, setCategories] = useState([]);
@@ -28,15 +29,46 @@ export default function AddProduct() {
 
       const formData = new FormData(event.target);
       formData.append("token", user.jwt);
-      const result = await addProduct(formData);
 
-      if (result.success) {
+      try {
+         const response = await fetch(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products`,
+            {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${user.jwt}`,
+               },
+               body: JSON.stringify({
+                  data: {
+                     name: formData.get("name"),
+                     quantity: parseFloat(formData.get("quantity")),
+                     isInCart: formData.get("isInCart") === "true",
+                     isToBuy: formData.get("isToBuy") === "true",
+                     category: parseInt(formData.get("category")),
+                  },
+               }),
+            }
+         );
+
+         if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+               errorData.error?.message || "Erreur lors de l'ajout du produit"
+            );
+         }
+
+         // Rafraîchir la liste des produits dans le contexte
+         await refreshProducts();
+
+         // Rediriger vers la liste de courses
          router.push("/shopping-list");
-         router.refresh();
-      } else {
-         setError(result.error);
+      } catch (error) {
+         console.error("Erreur détaillée:", error);
+         setError(error.message);
+      } finally {
+         setLoading(false);
       }
-      setLoading(false);
    }
 
    return (
@@ -133,5 +165,13 @@ export default function AddProduct() {
             </button>
          </form>
       </div>
+   );
+}
+
+export default function AddProduct() {
+   return (
+      <ProductProvider>
+         <AddProductContent />
+      </ProductProvider>
    );
 }
