@@ -1,23 +1,34 @@
-import {
-   getStrapiProductsToBuy,
-   getStrapiProductsNotInCart,
-} from "@/actions/getProducts";
-import { getCategories } from "@/actions/categories";
-import ProductCard from "../../components/ProductCard";
+"use client";
 
-export default async function ShoppingList() {
-   const productsToBuy = await getStrapiProductsToBuy("products");
-   const productsNotInCart = await getStrapiProductsNotInCart("products");
-   const categories = await getCategories();
+import { getCategories } from "@/actions/categories";
+import { ProductProvider, useProducts } from "@/contexts/ProductContext";
+import ProductCard from "@/components/ProductCard";
+import { useEffect, useState } from "react";
+
+function ShoppingListContent() {
+   const { products, loading } = useProducts();
+   const [categories, setCategories] = useState([]);
+
+   useEffect(() => {
+      const loadCategories = async () => {
+         const data = await getCategories();
+         setCategories(data);
+      };
+      loadCategories();
+   }, []);
 
    // Filtrer les produits non dans le panier
-   const productsNotInCartFiltered = productsToBuy.filter(
+   const productsNotInCartFiltered = products.filter(
       (product) => !product.isInCart
    );
    // Filtrer les produits dans le panier
-   const productsInCartFiltered = productsToBuy.filter(
+   const productsInCartFiltered = products.filter(
       (product) => product.isInCart
    );
+
+   if (loading) {
+      return <div>Chargement...</div>;
+   }
 
    return (
       <div className="">
@@ -39,7 +50,10 @@ export default async function ShoppingList() {
                         </h3>
                         <ul className="space-y-3">
                            {productsInCategory.map((product) => (
-                              <ProductCard key={product.id} product={product} />
+                              <ProductCard
+                                 key={product.documentId}
+                                 product={product}
+                              />
                            ))}
                         </ul>
                      </div>
@@ -53,12 +67,23 @@ export default async function ShoppingList() {
                   <h2 className="text-xl font-semibold mb-4">Dans le panier</h2>
                   <ul className="space-y-3">
                      {productsInCartFiltered.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard
+                           key={product.documentId}
+                           product={product}
+                        />
                      ))}
                   </ul>
                </div>
             )}
          </div>
       </div>
+   );
+}
+
+export default function ShoppingList() {
+   return (
+      <ProductProvider>
+         <ShoppingListContent />
+      </ProductProvider>
    );
 }

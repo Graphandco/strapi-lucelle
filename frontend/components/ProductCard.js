@@ -1,13 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { changeProductInCart } from "@/actions/changeProduct";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProducts } from "@/contexts/ProductContext";
 
 const ProductCard = ({ product }) => {
    const { user } = useAuth();
-   const router = useRouter();
+   const { updateProductStatus } = useProducts();
    const productImage = product.image?.formats?.thumbnail?.url
       ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${product.image.formats.thumbnail.url}`
       : null;
@@ -17,12 +16,11 @@ const ProductCard = ({ product }) => {
          className="bg-card flex items-center justify-between rounded-xl py-3 px-5 cursor-pointer hover:bg-card/80 transition-colors"
          onClick={async () => {
             if (!user?.jwt) return;
-            await changeProductInCart(
+            await updateProductStatus(
                product.documentId,
                product.isInCart,
                user.jwt
             );
-            router.refresh();
          }}
       >
          <div className="flex items-center gap-4">
