@@ -14,11 +14,8 @@ export default function Inventaire() {
    useEffect(() => {
       async function fetchProducts() {
          const data = await getStrapiProductsNotToBuy("products");
-         setProducts(
-            data.map((p) => (p.attributes ? { id: p.id, ...p.attributes } : p))
-         );
+         setProducts(data);
          setLoading(false);
-         console.log(data);
       }
       fetchProducts();
    }, []);

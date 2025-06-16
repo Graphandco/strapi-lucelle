@@ -1,54 +1,63 @@
 import {
-   getStrapiProductsInCart,
+   getStrapiProductsToBuy,
    getStrapiProductsNotInCart,
 } from "@/actions/getProducts";
+import { getCategories } from "@/actions/categories";
+import ProductCard from "../../components/ProductCard";
 
 export default async function ShoppingList() {
-   const productsInCart = await getStrapiProductsInCart("products");
+   const productsToBuy = await getStrapiProductsToBuy("products");
    const productsNotInCart = await getStrapiProductsNotInCart("products");
+   const categories = await getCategories();
+
+   // Filtrer les produits non dans le panier
+   const productsNotInCartFiltered = productsToBuy.filter(
+      (product) => !product.isInCart
+   );
+   // Filtrer les produits dans le panier
+   const productsInCartFiltered = productsToBuy.filter(
+      (product) => product.isInCart
+   );
 
    return (
-      <div className="container mx-auto p-4">
-         <h1 className="text-2xl font-bold mb-4">Liste de courses</h1>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="">
+         <div className="grid gap-8">
+            {/* Liste des produits non dans le panier, triés par catégorie */}
             <div>
-               <h2 className="text-xl font-semibold mb-2">Dans le panier</h2>
-               <ul className="rounded-lg shadow p-4 space-y-2">
-                  {productsInCart && productsInCart.length > 0 ? (
-                     productsInCart.map((product) => (
-                        <li
-                           key={product.id}
-                           className="border-b last:border-b-0 py-2"
-                        >
-                           {product.name}{" "}
-                           <span className="">x{product.quantity}</span>
-                        </li>
-                     ))
-                  ) : (
-                     <li className="text-gray-400">
-                        Aucun produit dans le panier.
-                     </li>
-                  )}
-               </ul>
+               <h2 className="text-xl font-semibold mb-4">À acheter</h2>
+               {categories.map((category) => {
+                  const productsInCategory = productsNotInCartFiltered.filter(
+                     (product) => product.category?.id === category.id
+                  );
+
+                  if (productsInCategory.length === 0) return null;
+
+                  return (
+                     <div key={category.id} className="mb-6">
+                        <h3 className="text-lg text-white font-medium mb-2">
+                           {category.name}
+                        </h3>
+                        <ul className="space-y-3">
+                           {productsInCategory.map((product) => (
+                              <ProductCard key={product.id} product={product} />
+                           ))}
+                        </ul>
+                     </div>
+                  );
+               })}
             </div>
-            <div>
-               <h2 className="text-xl font-semibold mb-2">À acheter</h2>
-               <ul className="rounded-lg shadow p-4 space-y-2">
-                  {productsNotInCart && productsNotInCart.length > 0 ? (
-                     productsNotInCart.map((product) => (
-                        <li
-                           key={product.id}
-                           className="border-b last:border-b-0 py-2"
-                        >
-                           {product.name}{" "}
-                           <span className="">x{product.quantity}</span>
-                        </li>
-                     ))
-                  ) : (
-                     <li className="text-gray-400">Aucun produit à acheter.</li>
-                  )}
-               </ul>
-            </div>
+
+            {/* Liste des produits dans le panier */}
+            {productsInCartFiltered.length > 0 && (
+               <div>
+                  <h2 className="text-xl font-semibold mb-4">Dans le panier</h2>
+                  <ul className="space-y-3">
+                     {productsInCartFiltered.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                     ))}
+                  </ul>
+               </div>
+            )}
          </div>
       </div>
    );
