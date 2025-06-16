@@ -23,24 +23,6 @@ export default function Header() {
                         >
                            Dashboard
                         </Link>
-                        <Link
-                           href="/shopping-list"
-                           className="text-gray-600 hover:text-gray-900"
-                        >
-                           Shopping List
-                        </Link>
-                        <Link
-                           href="/add-product"
-                           className="text-gray-600 hover:text-gray-900"
-                        >
-                           Ajouter un produit
-                        </Link>
-                        <Link
-                           href="/inventaire"
-                           className="text-gray-600 hover:text-gray-900"
-                        >
-                           Inventaire
-                        </Link>
                      </>
                   ) : (
                      <Link
