@@ -29,6 +29,18 @@ export default function Header() {
                         >
                            Shopping List
                         </Link>
+                        <Link
+                           href="/add-product"
+                           className="text-gray-600 hover:text-gray-900"
+                        >
+                           Ajouter un produit
+                        </Link>
+                        <Link
+                           href="/inventaire"
+                           className="text-gray-600 hover:text-gray-900"
+                        >
+                           Inventaire
+                        </Link>
                      </>
                   ) : (
                      <Link

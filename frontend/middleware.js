@@ -7,7 +7,9 @@ export function middleware(request) {
       request.nextUrl.pathname.startsWith("/register");
    const isProtectedRoute =
       request.nextUrl.pathname.startsWith("/dashboard") ||
-      request.nextUrl.pathname.startsWith("/shopping-list");
+      request.nextUrl.pathname.startsWith("/shopping-list") ||
+      request.nextUrl.pathname.startsWith("/add-product") ||
+      request.nextUrl.pathname.startsWith("/inventaire");
 
    const isAuthenticated = userCookie && userCookie.value;
 
@@ -28,5 +30,7 @@ export const config = {
       "/login",
       "/register",
       "/shopping-list/:path*",
+      "/add-product",
+      "/inventaire",
    ],
 };
