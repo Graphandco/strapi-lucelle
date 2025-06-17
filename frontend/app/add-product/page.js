@@ -1,62 +1,46 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { getCategories } from "@/actions/categories";
-import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { addProduct } from "@/actions/addProduct";
+import { getCategories } from "@/actions/categories";
 
 export default function AddProduct() {
-   const router = useRouter();
    const { user } = useAuth();
    const { refreshProducts } = useProducts();
-   const [error, setError] = useState("");
-   const [loading, setLoading] = useState(false);
+   const router = useRouter();
    const [categories, setCategories] = useState([]);
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState(null);
 
    useEffect(() => {
-      const fetchCategories = async () => {
-         const data = await getCategories();
-         setCategories(data);
+      const loadCategories = async () => {
+         try {
+            const data = await getCategories();
+            setCategories(data);
+         } catch (error) {
+            console.error("Erreur lors du chargement des catégories:", error);
+         }
       };
-      fetchCategories();
+      loadCategories();
    }, []);
 
    async function handleSubmit(event) {
       event.preventDefault();
       setLoading(true);
-      setError("");
+      setError(null);
 
       const formData = new FormData(event.target);
       formData.append("token", user.jwt);
 
       try {
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products`,
-            {
-               method: "POST",
-               headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${user.jwt}`,
-               },
-               body: JSON.stringify({
-                  data: {
-                     name: formData.get("name"),
-                     quantity: parseFloat(formData.get("quantity")),
-                     // isInCart: formData.get("isInCart") === "true",
-                     // isToBuy: formData.get("isToBuy") === "true",
-                     isInCart: false,
-                     isToBuy: true,
-                     category: parseInt(formData.get("category")),
-                  },
-               }),
-            }
-         );
+         const result = await addProduct(formData);
 
-         if (!response.ok) {
-            const errorData = await response.json();
+         if (!result.success) {
             throw new Error(
-               errorData.error?.message || "Erreur lors de l'ajout du produit"
+               result.error || "Erreur lors de l'ajout du produit"
             );
          }
 
@@ -86,7 +70,7 @@ export default function AddProduct() {
                   name="name"
                   required
                   placeholder="Nom du produit"
-                  className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white placeholder:text-sm"
+                  className="bg-card outline-none border-none rounded-lg w-full p-4 placeholder:text-white placeholder:text-sm"
                />
             </div>
 
@@ -95,7 +79,7 @@ export default function AddProduct() {
                   id="category"
                   name="category"
                   required
-                  className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 text-white text-sm"
+                  className="bg-card outline-none border-none rounded-lg w-full p-4 text-white text-sm"
                >
                   <option value="" className="text-white text-sm">
                      Sélectionner une catégorie
@@ -112,7 +96,7 @@ export default function AddProduct() {
                </select>
             </div>
 
-            <div>
+            {/* <div>
                <input
                   type="number"
                   id="quantity"
@@ -124,7 +108,7 @@ export default function AddProduct() {
                   placeholder="Quantité"
                   className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white placeholder:text-sm"
                />
-            </div>
+            </div> */}
 
             {/* <div className="flex items-center space-x-4">
                <div className="flex items-center">
@@ -154,9 +138,10 @@ export default function AddProduct() {
 
             <button
                type="submit"
-               className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90"
+               disabled={loading}
+               className="w-full bg-primary text-black py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
             >
-               {loading ? "Ajout en cours..." : "Ajouter le produit"}
+               {loading ? "Ajout en cours..." : "Ajouter"}
             </button>
          </form>
       </div>

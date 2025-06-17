@@ -2,7 +2,6 @@
 
 export async function addProduct(formData) {
    const name = formData.get("name");
-   const quantity = formData.get("quantity");
    const isInCart = formData.get("isInCart") === "true";
    const isToBuy = formData.get("isToBuy") === "true";
    const category = formData.get("category");
@@ -11,9 +10,9 @@ export async function addProduct(formData) {
    const product = {
       data: {
          name,
-         quantity: parseFloat(quantity),
-         isInCart,
-         isToBuy,
+         quantity: 1,
+         isInCart: false,
+         isToBuy: true,
          category: parseInt(category),
       },
    };
