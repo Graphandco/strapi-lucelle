@@ -29,7 +29,7 @@ export default function Homepage() {
                <ProductCard
                   key={product.documentId}
                   product={product}
-                  pageType="shopping-list"
+                  pageType="homepage"
                />
             ))}
          </ul>

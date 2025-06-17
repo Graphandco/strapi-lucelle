@@ -27,8 +27,13 @@ import { toast } from "sonner";
 import SearchBar from "@/components/SearchBar";
 
 export default function ShoppingList() {
-   const { allProducts, updateProductToBuy, updateProductInCart, loading } =
-      useProducts();
+   const {
+      allProducts,
+      updateProductToBuy,
+      updateProductInCart,
+      updateProductQuantity,
+      loading,
+   } = useProducts();
    const { user } = useAuth();
    const [categories, setCategories] = useState([]);
    const [isClearing, setIsClearing] = useState(false);
@@ -67,11 +72,15 @@ export default function ShoppingList() {
          // Mettre à jour chaque produit du panier de manière séquentielle
          for (const product of productsInCart) {
             try {
+               // Réinitialiser la quantité à 1
+               await updateProductQuantity(product.documentId, 1, user.jwt);
+               // Mettre à jour le statut isToBuy
                await updateProductToBuy(
                   product.documentId,
                   product.isToBuy,
                   user.jwt
                );
+               // Mettre à jour le statut isInCart
                await updateProductInCart(
                   product.documentId,
                   product.isInCart,

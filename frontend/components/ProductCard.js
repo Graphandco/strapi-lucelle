@@ -4,14 +4,27 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { MinusCircle, PlusCircle } from "lucide-react";
 
 const ProductCard = ({ product, pageType }) => {
    const { user } = useAuth();
-   const { updateProductInCart, updateProductToBuy } = useProducts();
+   const { updateProductInCart, updateProductToBuy, updateProductQuantity } =
+      useProducts();
    const productImage = product.image?.formats?.thumbnail?.url
       ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${product.image.formats.thumbnail.url}`
       : null;
    const isToBuy = pageType === "inventaire" && product.isToBuy;
+   const showQuantity =
+      pageType === "inventaire" || pageType === "shopping-list";
+
+   const handleQuantityChange = async (newQuantity) => {
+      if (!user?.jwt || newQuantity < 0) return;
+      try {
+         await updateProductQuantity(product.documentId, newQuantity, user.jwt);
+      } catch (error) {
+         console.error("Erreur lors de la mise à jour de la quantité:", error);
+      }
+   };
 
    return (
       <AnimatePresence mode="wait">
@@ -26,12 +39,12 @@ const ProductCard = ({ product, pageType }) => {
                   ease: "easeOut",
                },
             }}
-            className={`bg-card flex items-center justify-between my-1 py-2 px-1 cursor-pointer border-b border-white/5 outline  ${
+            className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer border-b border-white/5 outline ${
                isToBuy ? "outline-white" : "outline-transparent"
             }`}
             onClick={async () => {
                if (!user?.jwt) return;
-               if (pageType === "shopping-list") {
+               if (pageType !== "inventaire") {
                   await updateProductInCart(
                      product.documentId,
                      product.isInCart,
@@ -50,24 +63,34 @@ const ProductCard = ({ product, pageType }) => {
                <Image
                   src={productImage ? productImage : "/no-image.png"}
                   alt={product.name || "Produit sans nom"}
-                  width={35}
-                  height={35}
-                  className="rounded-full bg-white p-1"
+                  width={25}
+                  height={25}
                />
-               <span className="text-white text-sm">{product.name}</span>
-               {/* <span className="text-xs text-gray-500">
-                  {product.isInCart ? "Dans le panier" : "À acheter"}
-               </span>
-               <span className="text-xs text-gray-500">
-                  {product.isToBuy ? "Liste" : "Inventaire"}
-               </span> */}
+               <span className="text-white">{product.name}</span>
             </div>
-            <span className="">
-               <div className="flex items-center gap-1.5 text-xs text-white">
-                  <span>x</span>
-                  <span>{product.quantity || 1}</span>
+            {showQuantity && (
+               <div
+                  className="flex items-center"
+                  onClick={(e) => e.stopPropagation()} // Empêche le clic de se propager au li
+               >
+                  <button
+                     onClick={() => handleQuantityChange(product.quantity - 1)}
+                     className=" p-1 rounded-full hover:bg-primary/10 transition-colors"
+                     disabled={product.quantity <= 1}
+                  >
+                     <MinusCircle size={16} className="text-primary/50" />
+                  </button>
+                  <span className="text-white min-w-[20px] text-center">
+                     {product.quantity}
+                  </span>
+                  <button
+                     onClick={() => handleQuantityChange(product.quantity + 1)}
+                     className=" p-1 rounded-full hover:bg-primary/10 transition-colors"
+                  >
+                     <PlusCircle size={16} className="text-primary/50" />
+                  </button>
                </div>
-            </span>
+            )}
          </motion.li>
       </AnimatePresence>
    );

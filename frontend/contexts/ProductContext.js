@@ -115,11 +115,57 @@ export function ProductProvider({ children }) {
       }
    };
 
+   const updateProductQuantity = async (productId, newQuantity, token) => {
+      try {
+         // Mise à jour optimiste de l'UI
+         setAllProducts((prevProducts) =>
+            prevProducts.map((product) =>
+               product.documentId === productId
+                  ? { ...product, quantity: newQuantity }
+                  : product
+            )
+         );
+
+         // Mise à jour dans Strapi
+         const response = await fetch(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
+            {
+               method: "PUT",
+               headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+               },
+               body: JSON.stringify({
+                  data: {
+                     quantity: newQuantity,
+                  },
+               }),
+            }
+         );
+
+         if (!response.ok) {
+            // En cas d'erreur, on revient à l'état précédent
+            setAllProducts((prevProducts) =>
+               prevProducts.map((product) =>
+                  product.documentId === productId
+                     ? { ...product, quantity: product.quantity }
+                     : product
+               )
+            );
+            throw new Error("Failed to update product quantity");
+         }
+      } catch (error) {
+         console.error("Error updating product quantity:", error);
+         throw error;
+      }
+   };
+
    const value = {
       allProducts,
       loading,
       updateProductInCart,
       updateProductToBuy,
+      updateProductQuantity,
       refreshProducts: loadAllProducts,
    };
 
