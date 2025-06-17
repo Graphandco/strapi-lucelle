@@ -21,7 +21,7 @@ export default function LoginForm() {
          if (data && data.jwt) {
             authLogin(data);
             setTimeout(() => {
-               router.push("/dashboard");
+               router.push("/");
             }, 100);
          } else {
             throw new Error("Données de connexion invalides");

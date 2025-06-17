@@ -26,7 +26,12 @@ export default function Inventaire() {
          <div className="grid gap-8">
             {/* Liste des produits triés par catégorie */}
             <div>
-               <h2 className="text-xl font-semibold mb-4">Inventaire</h2>
+               <h1 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
+                  Inventaire
+                  <span className="text-base text-white mt-1">
+                     ({allProducts.length})
+                  </span>
+               </h1>{" "}
                {categories.map((category) => {
                   const productsInCategory = allProducts.filter(
                      (product) => product.category?.id === category.id
@@ -39,7 +44,7 @@ export default function Inventaire() {
                         <h3 className="text-lg text-white font-medium mb-2">
                            {category.name}
                         </h3>
-                        <ul className="space-y-3">
+                        <ul className="bg-card rounded-lg px-3 pb-2">
                            {productsInCategory.map((product) => (
                               <ProductCard
                                  key={product.documentId}

@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Header() {
    const { user } = useAuth();
-   console.log("User data:", user);
 
    const avatarUrl = user?.user?.avatar?.url
       ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${user.user.avatar.url}`
@@ -28,23 +27,14 @@ export default function Header() {
                </Link>
 
                <div className="flex items-center gap-4">
-                  {user ? (
-                     <>
-                        <Link href="/dashboard">
-                           <Avatar>
-                              <AvatarImage src={avatarUrl} />
-                              <AvatarFallback>
-                                 {user.user?.username?.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                           </Avatar>
-                        </Link>
-                     </>
-                  ) : (
-                     <Link
-                        href="/login"
-                        className="text-gray-600 hover:text-gray-900"
-                     >
-                        Connexion
+                  {user && (
+                     <Link href="/dashboard">
+                        <Avatar>
+                           <AvatarImage src={avatarUrl} />
+                           <AvatarFallback>
+                              {user.user?.username?.charAt(0).toUpperCase()}
+                           </AvatarFallback>
+                        </Avatar>
                      </Link>
                   )}
                </div>

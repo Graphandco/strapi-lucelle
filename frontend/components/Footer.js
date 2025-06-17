@@ -16,13 +16,6 @@ export default function Footer() {
                href="/shopping-list"
                className="flex flex-col items-center gap-1 px-2"
             >
-               <CircleUser className="w-6 h-6 text-white" />
-               <span className="text-white text-[10px]">Dashboard</span>
-            </Link>
-            <Link
-               href="/shopping-list"
-               className="flex flex-col items-center gap-1 px-2"
-            >
                <ShoppingCart className="w-6 h-6 text-white" />
                <span className="text-white text-[10px]">Panier</span>
             </Link>
@@ -33,6 +26,13 @@ export default function Footer() {
             >
                <Store className="w-6 h-6 text-white" />
                <span className="text-white text-[10px]">Inventaire</span>
+            </Link>
+            <Link
+               href="/shopping-list"
+               className="flex flex-col items-center gap-1 px-2"
+            >
+               <CircleUser className="w-6 h-6 text-white" />
+               <span className="text-white text-[10px]">Dashboard</span>
             </Link>
             <Link
                href="/add-product"

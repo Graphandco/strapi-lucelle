@@ -111,13 +111,13 @@ export default function ShoppingList() {
    }
 
    return (
-      <div className="container">
-         <h2 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
+      <div className="">
+         <h1 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
             Liste de courses
             <span className="text-base text-white mt-1">
                ({productsNotInCart.length})
             </span>
-         </h2>
+         </h1>
          <SearchBar />
          <div className="grid gap-8">
             {/* Liste des produits non dans le panier, triés par catégorie */}
@@ -134,7 +134,7 @@ export default function ShoppingList() {
                         <h3 className="text-sm text-bg mb-2 text-primary/50">
                            {category.name}
                         </h3>
-                        <ul className="">
+                        <ul className="pb-2">
                            {productsInCategory.map((product) => (
                               <ProductCard
                                  key={product.documentId}
@@ -156,7 +156,7 @@ export default function ShoppingList() {
                         <AccordionTrigger>Déjà dans le panier</AccordionTrigger>
                         <AccordionContent className="text-center">
                            <>
-                              <ul className="space-y-3">
+                              <ul className="bg-card rounded-lg px-3 py-2">
                                  {productsInCart.map((product) => (
                                     <ProductCard
                                        key={product.documentId}

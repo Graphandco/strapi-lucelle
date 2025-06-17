@@ -6,6 +6,7 @@ export function middleware(request) {
       request.nextUrl.pathname.startsWith("/login") ||
       request.nextUrl.pathname.startsWith("/register");
    const isProtectedRoute =
+      request.nextUrl.pathname === "/" ||
       request.nextUrl.pathname.startsWith("/dashboard") ||
       request.nextUrl.pathname.startsWith("/shopping-list") ||
       request.nextUrl.pathname.startsWith("/add-product") ||
@@ -26,6 +27,7 @@ export function middleware(request) {
 
 export const config = {
    matcher: [
+      "/",
       "/dashboard/:path*",
       "/login",
       "/register",

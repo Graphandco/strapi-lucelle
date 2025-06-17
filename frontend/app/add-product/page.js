@@ -74,39 +74,38 @@ export default function AddProduct() {
    }
 
    return (
-      <div className="container mx-auto p-4">
-         <h1 className="text-2xl font-bold mb-4">Ajouter un produit</h1>
-
+      <div className="">
+         <h1 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
+            Ajouter un produit
+         </h1>
          <form onSubmit={handleSubmit} className="max-w-md space-y-4">
             <div>
-               <label htmlFor="name" className="block text-sm font-medium mb-1">
-                  Nom du produit
-               </label>
                <input
                   type="text"
                   id="name"
                   name="name"
                   required
-                  className="w-full p-2 border rounded"
+                  placeholder="Nom du produit"
+                  className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white placeholder:text-sm"
                />
             </div>
 
             <div>
-               <label
-                  htmlFor="category"
-                  className="block text-sm font-medium mb-1"
-               >
-                  Catégorie
-               </label>
                <select
                   id="category"
                   name="category"
                   required
-                  className="w-full p-2 border rounded"
+                  className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 text-white text-sm"
                >
-                  <option value="">Sélectionner une catégorie</option>
+                  <option value="" className="text-white text-sm">
+                     Sélectionner une catégorie
+                  </option>
                   {categories.map((category) => (
-                     <option key={category.id} value={category.id}>
+                     <option
+                        key={category.id}
+                        value={category.id}
+                        className="text-white text-sm"
+                     >
                         {category.name}
                      </option>
                   ))}
@@ -114,12 +113,6 @@ export default function AddProduct() {
             </div>
 
             <div>
-               <label
-                  htmlFor="quantity"
-                  className="block text-sm font-medium mb-1"
-               >
-                  Quantité
-               </label>
                <input
                   type="number"
                   id="quantity"
@@ -128,7 +121,8 @@ export default function AddProduct() {
                   step="1"
                   defaultValue="1"
                   required
-                  className="w-full p-2 border rounded"
+                  placeholder="Quantité"
+                  className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white placeholder:text-sm"
                />
             </div>
 
@@ -160,8 +154,7 @@ export default function AddProduct() {
 
             <button
                type="submit"
-               disabled={loading}
-               className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+               className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90"
             >
                {loading ? "Ajout en cours..." : "Ajouter le produit"}
             </button>

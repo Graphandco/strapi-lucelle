@@ -39,8 +39,8 @@ const ProductCard = ({ product, pageType }) => {
                   ease: "easeOut",
                },
             }}
-            className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer border-b border-white/5 outline ${
-               isToBuy ? "outline-white" : "outline-transparent"
+            className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer border-b border-white/5 ${
+               isToBuy ? "!opacity-20 " : "opacity-100"
             }`}
             onClick={async () => {
                if (!user?.jwt) return;
@@ -66,7 +66,7 @@ const ProductCard = ({ product, pageType }) => {
                   width={25}
                   height={25}
                />
-               <span className="text-white">{product.name}</span>
+               <span className="text-white text-sm">{product.name}</span>
             </div>
             {showQuantity && (
                <div
