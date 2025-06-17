@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
             <AuthProvider>
                <ProductProvider>
                   <Header />
-                  <main className="min-h-screen pt-5 pb-20">{children}</main>
+                  <main className="pt-5 pb-20">{children}</main>
                   <Footer />
                   <Toaster position="top-center" />
                </ProductProvider>

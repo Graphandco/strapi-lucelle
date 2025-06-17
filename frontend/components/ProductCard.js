@@ -26,8 +26,8 @@ const ProductCard = ({ product, pageType }) => {
                   ease: "easeOut",
                },
             }}
-            className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer border-b border-white/5 ${
-               isToBuy ? "border-white" : "border-transparent"
+            className={`bg-card flex items-center justify-between my-1 py-2 px-1 cursor-pointer border-b border-white/5 outline  ${
+               isToBuy ? "outline-white" : "outline-transparent"
             }`}
             onClick={async () => {
                if (!user?.jwt) return;

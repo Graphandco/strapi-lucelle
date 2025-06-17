@@ -14,7 +14,7 @@ export default function Header() {
       : null;
 
    return (
-      <header className="border-b border-primary/10">
+      <header className="bg-black">
          <div className="container py-4">
             <nav className="flex items-center justify-between">
                <Link href="/" className="flex items-center gap-2 font-bold">
@@ -24,7 +24,7 @@ export default function Header() {
                      width={32}
                      height={32}
                   />
-                  Shopping List
+                  Shop'& Co
                </Link>
 
                <div className="flex items-center gap-4">

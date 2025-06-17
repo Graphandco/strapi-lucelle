@@ -11,7 +11,7 @@ export async function getStrapiPageBySlug(slug) {
 }
 
 export async function getStrapiProducts(collection) {
-   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?populate=*`;
+   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?populate=*&pagination[limit]=500`;
    const res = await fetch(url, { cache: "no-store" });
 
    if (!res.ok) {
@@ -26,7 +26,7 @@ export async function getStrapiProducts(collection) {
 }
 
 export async function getStrapiProductsInCart(collection) {
-   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isInCart][$eq]=true&populate=*`;
+   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isInCart][$eq]=true&populate=*&pagination[limit]=500`;
    const res = await fetch(url, { cache: "no-store" });
 
    if (!res.ok) {
@@ -43,7 +43,7 @@ export async function getStrapiProductsInCart(collection) {
 }
 
 export async function getStrapiProductsNotInCart(collection) {
-   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isInCart][$eq]=false&populate=*`;
+   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isInCart][$eq]=false&populate=*&pagination[limit]=500`;
    const res = await fetch(url, { cache: "no-store" });
 
    if (!res.ok) {
@@ -60,7 +60,7 @@ export async function getStrapiProductsNotInCart(collection) {
 }
 
 export async function getStrapiProductsToBuy(collection) {
-   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isToBuy][$eq]=true&populate=*`;
+   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isToBuy][$eq]=true&populate=*&pagination[limit]=500`;
    const res = await fetch(url, { cache: "no-store" });
 
    if (!res.ok) {
@@ -75,7 +75,7 @@ export async function getStrapiProductsToBuy(collection) {
 }
 
 export async function getStrapiProductsNotToBuy(collection) {
-   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isToBuy][$eq]=false&populate=*`;
+   let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/${collection}?filters[isToBuy][$eq]=false&populate=*&pagination[limit]=500`;
    const res = await fetch(url, { cache: "no-store" });
 
    if (!res.ok) {

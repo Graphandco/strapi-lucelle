@@ -22,7 +22,8 @@ export default function SearchBar() {
          .filter((product) => !product.isToBuy)
          .filter((product) =>
             product.name.toLowerCase().includes(searchTerm.toLowerCase())
-         );
+         )
+         .slice(0, 3); // Limite à 3 produits
       setFilteredProducts(filtered);
    }, [searchTerm, allProducts]);
 
@@ -53,7 +54,7 @@ export default function SearchBar() {
                         <li
                            key={product.documentId}
                            onClick={() => handleProductClick(product)}
-                           className=" hover:bg-primary/10 cursor-pointer text-white flex flex-col items-center gap-2"
+                           className="hover:bg-primary/10 cursor-pointer text-white flex flex-col items-center gap-2"
                         >
                            <Image
                               src={

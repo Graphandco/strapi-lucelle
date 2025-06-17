@@ -11,7 +11,9 @@ export default function Homepage() {
    // Filtrer les produits qui sont à acheter
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    // Filtrer les produits qui ne sont pas dans le panier
-   const productsNotInCart = allProducts.filter((product) => !product.isInCart);
+   const productsNotInCart = productsToBuy.filter(
+      (product) => !product.isInCart
+   );
 
    if (loading) {
       return <div>Chargement...</div>;

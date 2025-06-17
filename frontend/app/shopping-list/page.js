@@ -32,11 +32,20 @@ export default function ShoppingList() {
    const { user } = useAuth();
    const [categories, setCategories] = useState([]);
    const [isClearing, setIsClearing] = useState(false);
+   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
    useEffect(() => {
       const loadCategories = async () => {
-         const data = await getCategories();
-         setCategories(data);
+         try {
+            setIsLoadingCategories(true);
+            const data = await getCategories();
+            setCategories(data);
+         } catch (error) {
+            console.error("Erreur lors du chargement des catégories:", error);
+            toast.error("Erreur lors du chargement des catégories");
+         } finally {
+            setIsLoadingCategories(false);
+         }
       };
       loadCategories();
    }, []);
@@ -84,16 +93,26 @@ export default function ShoppingList() {
       }
    };
 
-   if (loading) {
-      return <div>Chargement...</div>;
+   if (loading || isLoadingCategories) {
+      return (
+         <div className="container flex items-center justify-center min-h-screen">
+            <div className="text-white">Chargement...</div>
+         </div>
+      );
    }
 
    return (
-      <div className=" container">
+      <div className="container">
+         <h2 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
+            Liste de courses
+            <span className="text-base text-white mt-1">
+               ({productsNotInCart.length})
+            </span>
+         </h2>
          <SearchBar />
          <div className="grid gap-8">
             {/* Liste des produits non dans le panier, triés par catégorie */}
-            <div className="bg-card rounded-lg px-3 pb-3">
+            <div className="bg-card rounded-lg px-3 pb-1">
                {categories.map((category) => {
                   const productsInCategory = productsNotInCart.filter(
                      (product) => product.category?.id === category.id
