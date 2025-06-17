@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { getCategories } from "@/actions/categories";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useProducts, ProductProvider } from "@/contexts/ProductContext";
+import { useProducts } from "@/contexts/ProductContext";
 
-function AddProductContent() {
+export default function AddProduct() {
    const router = useRouter();
    const { user } = useAuth();
    const { refreshProducts } = useProducts();
@@ -43,8 +43,10 @@ function AddProductContent() {
                   data: {
                      name: formData.get("name"),
                      quantity: parseFloat(formData.get("quantity")),
-                     isInCart: formData.get("isInCart") === "true",
-                     isToBuy: formData.get("isToBuy") === "true",
+                     // isInCart: formData.get("isInCart") === "true",
+                     // isToBuy: formData.get("isToBuy") === "true",
+                     isInCart: false,
+                     isToBuy: true,
                      category: parseInt(formData.get("category")),
                   },
                }),
@@ -58,7 +60,7 @@ function AddProductContent() {
             );
          }
 
-         // Rafraîchir la liste des produits dans le contexte
+         // Recharger tous les produits
          await refreshProducts();
 
          // Rediriger vers la liste de courses
@@ -123,14 +125,14 @@ function AddProductContent() {
                   id="quantity"
                   name="quantity"
                   min="0"
-                  step="0.1"
+                  step="1"
                   defaultValue="1"
                   required
                   className="w-full p-2 border rounded"
                />
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* <div className="flex items-center space-x-4">
                <div className="flex items-center">
                   <input
                      type="checkbox"
@@ -152,7 +154,7 @@ function AddProductContent() {
                   />
                   <label htmlFor="isToBuy">À acheter</label>
                </div>
-            </div>
+            </div> */}
 
             {error && <div className="text-red-500 text-sm">{error}</div>}
 
@@ -165,13 +167,5 @@ function AddProductContent() {
             </button>
          </form>
       </div>
-   );
-}
-
-export default function AddProduct() {
-   return (
-      <ProductProvider>
-         <AddProductContent />
-      </ProductProvider>
    );
 }

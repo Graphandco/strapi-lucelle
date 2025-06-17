@@ -21,7 +21,26 @@ export async function login(identifier, password) {
          throw new Error(data.error?.message || "Une erreur est survenue");
       }
 
-      return data;
+      // Récupérer les données complètes de l'utilisateur avec les relations
+      const userRes = await fetch(`${STRAPI_URL}/api/users/me?populate=*`, {
+         headers: {
+            Authorization: `Bearer ${data.jwt}`,
+         },
+      });
+
+      if (!userRes.ok) {
+         throw new Error(
+            "Erreur lors de la récupération des données utilisateur"
+         );
+      }
+
+      const userData = await userRes.json();
+
+      // Combiner le JWT avec les données utilisateur complètes
+      return {
+         jwt: data.jwt,
+         user: userData,
+      };
    } catch (error) {
       throw new Error(error.message);
    }
@@ -47,7 +66,26 @@ export async function register(username, email, password) {
          throw new Error(data.error?.message || "Une erreur est survenue");
       }
 
-      return data;
+      // Récupérer les données complètes de l'utilisateur avec les relations
+      const userRes = await fetch(`${STRAPI_URL}/api/users/me?populate=*`, {
+         headers: {
+            Authorization: `Bearer ${data.jwt}`,
+         },
+      });
+
+      if (!userRes.ok) {
+         throw new Error(
+            "Erreur lors de la récupération des données utilisateur"
+         );
+      }
+
+      const userData = await userRes.json();
+
+      // Combiner le JWT avec les données utilisateur complètes
+      return {
+         jwt: data.jwt,
+         user: userData,
+      };
    } catch (error) {
       throw new Error(error.message);
    }

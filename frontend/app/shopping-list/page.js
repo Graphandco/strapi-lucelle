@@ -5,9 +5,30 @@ import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/ProductCard";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+   Accordion,
+   AccordionContent,
+   AccordionItem,
+   AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Recycle } from "lucide-react";
+import {
+   AlertDialog,
+   AlertDialogAction,
+   AlertDialogCancel,
+   AlertDialogContent,
+   AlertDialogDescription,
+   AlertDialogFooter,
+   AlertDialogHeader,
+   AlertDialogTitle,
+   AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import SearchBar from "@/components/SearchBar";
 
 export default function ShoppingList() {
-   const { allProducts, updateProductToBuy, loading } = useProducts();
+   const { allProducts, updateProductToBuy, updateProductInCart, loading } =
+      useProducts();
    const { user } = useAuth();
    const [categories, setCategories] = useState([]);
    const [isClearing, setIsClearing] = useState(false);
@@ -42,6 +63,11 @@ export default function ShoppingList() {
                   product.isToBuy,
                   user.jwt
                );
+               await updateProductInCart(
+                  product.documentId,
+                  product.isInCart,
+                  user.jwt
+               );
             } catch (error) {
                console.error(
                   `Erreur lors de la mise à jour du produit ${product.name}:`,
@@ -54,6 +80,7 @@ export default function ShoppingList() {
          console.error("Erreur lors du vidage du panier:", error);
       } finally {
          setIsClearing(false);
+         toast.success("Le panier a été vidé !");
       }
    };
 
@@ -62,11 +89,11 @@ export default function ShoppingList() {
    }
 
    return (
-      <div className="">
+      <div className=" container">
+         <SearchBar />
          <div className="grid gap-8">
             {/* Liste des produits non dans le panier, triés par catégorie */}
-            <div>
-               <h2 className="text-xl font-semibold mb-4">À acheter</h2>
+            <div className="bg-card rounded-lg px-3 pb-3">
                {categories.map((category) => {
                   const productsInCategory = productsNotInCart.filter(
                      (product) => product.category?.id === category.id
@@ -75,11 +102,11 @@ export default function ShoppingList() {
                   if (productsInCategory.length === 0) return null;
 
                   return (
-                     <div key={category.id} className="mb-6">
-                        <h3 className="text-lg text-white font-medium mb-2">
+                     <div key={category.id} className="mt-3">
+                        <h3 className="text-sm text-bg mb-2 text-primary/50">
                            {category.name}
                         </h3>
-                        <ul className="space-y-3">
+                        <ul className="">
                            {productsInCategory.map((product) => (
                               <ProductCard
                                  key={product.documentId}
@@ -96,25 +123,66 @@ export default function ShoppingList() {
             {/* Liste des produits dans le panier */}
             {productsInCart.length > 0 && (
                <div>
-                  <div className="flex items-center justify-between mb-4">
-                     <h2 className="text-xl font-semibold ">Dans le panier</h2>
-                     <button
-                        className="text-sm text-white disabled:opacity-50"
-                        onClick={handleClearCart}
-                        disabled={isClearing}
-                     >
-                        {isClearing ? "Vidage en cours..." : "Vider le panier"}
-                     </button>
-                  </div>
-                  <ul className="space-y-3">
-                     {productsInCart.map((product) => (
-                        <ProductCard
-                           key={product.documentId}
-                           product={product}
-                           pageType="shopping-list"
-                        />
-                     ))}
-                  </ul>
+                  <Accordion type="single" collapsible>
+                     <AccordionItem value="item-1">
+                        <AccordionTrigger>Déjà dans le panier</AccordionTrigger>
+                        <AccordionContent className="text-center">
+                           <>
+                              <ul className="space-y-3">
+                                 {productsInCart.map((product) => (
+                                    <ProductCard
+                                       key={product.documentId}
+                                       product={product}
+                                       pageType="shopping-list"
+                                    />
+                                 ))}
+                              </ul>
+
+                              <AlertDialog>
+                                 <AlertDialogTrigger asChild>
+                                    <div className="mt-4">
+                                       <div
+                                          className="rounded-lg text-sm text-black disabled:opacity-50 bg-primary py-2 px-6 inline-flex items-center gap-2 cursor-pointer hover:bg-primary-dark transition-colors"
+                                          role="button"
+                                          tabIndex={0}
+                                          disabled={isClearing}
+                                       >
+                                          {isClearing ? (
+                                             "Vidage en cours..."
+                                          ) : (
+                                             <>
+                                                <Recycle size={20} /> Vider
+                                             </>
+                                          )}
+                                       </div>
+                                    </div>
+                                 </AlertDialogTrigger>
+                                 <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                       <AlertDialogTitle>
+                                          Vider tout le panier?
+                                       </AlertDialogTitle>
+                                       <AlertDialogDescription>
+                                          Les produits seront remis dans
+                                          l'inventaire.
+                                       </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                       <AlertDialogCancel>
+                                          Annuler
+                                       </AlertDialogCancel>
+                                       <AlertDialogAction
+                                          onClick={handleClearCart}
+                                       >
+                                          Continuer
+                                       </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                 </AlertDialogContent>
+                              </AlertDialog>
+                           </>
+                        </AccordionContent>
+                     </AccordionItem>
+                  </Accordion>
                </div>
             )}
          </div>
