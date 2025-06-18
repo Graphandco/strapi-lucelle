@@ -37,7 +37,7 @@ export default function SearchBar() {
             const normalizedProductName = normalizeText(product.name);
             return normalizedProductName.includes(normalizedSearchTerm);
          })
-         .slice(0, 5); // Limite à 5 produits
+         .slice(0, 99); // Limite à 5 produits
       setFilteredProducts(filtered);
    }, [searchTerm, allProducts]);
 
@@ -58,7 +58,7 @@ export default function SearchBar() {
          />
          {filteredProducts.length > 0 && (
             <div className="my-3 rounded-lg px-3 z-10">
-               <ul className="py-2 flex flex-wrap items-center gap-7">
+               <ul className="py-2 grid grid-cols-4 items-center gap-7">
                   {filteredProducts.map((product) => {
                      const productImage = product.image?.formats?.thumbnail?.url
                         ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${product.image.formats.thumbnail.url}`
@@ -77,9 +77,9 @@ export default function SearchBar() {
                               alt={product.name || "Produit sans nom"}
                               width={45}
                               height={45}
-                              className="rounded-full bg-white p-1"
+                              className="h-[45px] object-contain"
                            />
-                           <span className="text-white text-xs">
+                           <span className="text-white text-xs text-center">
                               {product.name}
                            </span>
                         </li>
