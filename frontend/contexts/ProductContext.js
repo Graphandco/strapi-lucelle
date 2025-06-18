@@ -1,8 +1,6 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { getStrapiProducts } from "@/actions/getProducts";
-import { getCategories } from "@/actions/categories";
 
 const ProductContext = createContext();
 
@@ -19,7 +17,20 @@ export function ProductProvider({ children }) {
 
    const loadAllProducts = async () => {
       try {
-         const data = await getStrapiProducts("products");
+         const response = await fetch(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products?populate=*&pagination[limit]=500`,
+            {
+               cache: "no-store",
+            }
+         );
+
+         if (!response.ok) {
+            throw new Error("Erreur lors de la récupération des produits");
+         }
+
+         const json = await response.json();
+         const data = json.data || [];
+
          // Trier les produits par nom
          const sortedData = data.sort((a, b) =>
             a.name.localeCompare(b.name, "fr", { sensitivity: "base" })
@@ -34,7 +45,20 @@ export function ProductProvider({ children }) {
 
    const loadAllCategories = async () => {
       try {
-         const data = await getCategories();
+         const response = await fetch(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/categories?populate=*&pagination[limit]=500`,
+            {
+               cache: "no-store",
+            }
+         );
+
+         if (!response.ok) {
+            throw new Error("Erreur lors de la récupération des catégories");
+         }
+
+         const json = await response.json();
+         const data = json.data || [];
+
          // Trier les catégories par nom
          const sortedData = data.sort((a, b) =>
             a.name.localeCompare(b.name, "fr", { sensitivity: "base" })
