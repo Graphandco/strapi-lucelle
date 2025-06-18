@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { addProduct } from "@/actions/addProduct";
 
-export const metadata = {
-   title: "Ajouter un produit | Graph and Shop",
-};
+// export const metadata = {
+//    title: "Ajouter un produit | Graph and Shop",
+// };
 
 export default function AddProduct() {
    const { user } = useAuth();

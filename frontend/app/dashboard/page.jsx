@@ -18,9 +18,9 @@ import {
    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export const metadata = {
-   title: "Tableau de bord | Graph and Shop",
-};
+// export const metadata = {
+//    title: "Tableau de bord | Graph and Shop",
+// };
 
 export default function DashboardPage() {
    const { user, logout } = useAuth();

@@ -26,9 +26,9 @@ import { toast } from "sonner";
 import SearchBar from "@/components/SearchBar";
 import Image from "next/image";
 
-export const metadata = {
-   title: "Liste de courses | Graph and Shop",
-};
+// export const metadata = {
+//    title: "Liste de courses | Graph and Shop",
+// };
 
 export default function ShoppingList() {
    const {
