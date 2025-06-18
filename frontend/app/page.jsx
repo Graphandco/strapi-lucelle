@@ -24,6 +24,16 @@ export default function Homepage() {
    return (
       <div className="">
          <div className="py-3 space-y-1 text-center">
+            {areProductsToBuy && (
+               <Image
+                  src="/full-cart.png"
+                  alt="Caddie plein"
+                  width={100}
+                  height={100}
+                  className="mx-auto"
+                  priority
+               />
+            )}
             <div className="text-primary/50">
                Bienvenue {user?.user?.username} !
             </div>

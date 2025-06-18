@@ -17,7 +17,11 @@ export function ProductProvider({ children }) {
    const loadAllProducts = async () => {
       try {
          const data = await getStrapiProducts("products");
-         setAllProducts(data);
+         // Trier les produits par nom
+         const sortedData = data.sort((a, b) =>
+            a.name.localeCompare(b.name, "fr", { sensitivity: "base" })
+         );
+         setAllProducts(sortedData);
       } catch (error) {
          console.error("Error loading products:", error);
       } finally {
@@ -160,12 +164,43 @@ export function ProductProvider({ children }) {
       }
    };
 
+   const deleteProduct = async (productId, token) => {
+      try {
+         // Mise à jour optimiste de l'UI
+         setAllProducts((prevProducts) =>
+            prevProducts.filter((product) => product.documentId !== productId)
+         );
+
+         // Suppression dans Strapi
+         const response = await fetch(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
+            {
+               method: "DELETE",
+               headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+               },
+            }
+         );
+
+         if (!response.ok) {
+            // En cas d'erreur, on revient à l'état précédent
+            await loadAllProducts();
+            throw new Error("Failed to delete product");
+         }
+      } catch (error) {
+         console.error("Error deleting product:", error);
+         throw error;
+      }
+   };
+
    const value = {
       allProducts,
       loading,
       updateProductInCart,
       updateProductToBuy,
       updateProductQuantity,
+      deleteProduct,
       refreshProducts: loadAllProducts,
    };
 

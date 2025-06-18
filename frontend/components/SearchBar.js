@@ -40,7 +40,7 @@ export default function SearchBar() {
             placeholder="Rechercher un produit..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white placeholder:text-sm"
+            className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white/50 placeholder:italic placeholder:text-sm placeholder:font-light"
          />
          {filteredProducts.length > 0 && (
             <div className="my-3 rounded-lg px-3 z-10">

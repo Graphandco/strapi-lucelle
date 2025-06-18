@@ -39,7 +39,7 @@ const ProductCard = ({ product, pageType }) => {
                   ease: "easeOut",
                },
             }}
-            className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer border-b border-white/5 ${
+            className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer not-last:border-b border-white/10 ${
                isToBuy ? "!opacity-20 " : "opacity-100"
             }`}
             onClick={async () => {

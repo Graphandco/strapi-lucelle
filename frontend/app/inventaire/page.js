@@ -31,7 +31,7 @@ export default function Inventaire() {
                   <span className="text-base text-white mt-1">
                      ({allProducts.length})
                   </span>
-               </h1>{" "}
+               </h1>
                {categories.map((category) => {
                   const productsInCategory = allProducts.filter(
                      (product) => product.category?.id === category.id

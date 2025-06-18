@@ -59,7 +59,7 @@ export default function AddProduct() {
 
    return (
       <div className="">
-         <h1 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
+         <h1 className="text-2xl mb-5 px-1 text-primary/50 flex items-center gap-2">
             Ajouter un produit
          </h1>
          <form onSubmit={handleSubmit} className="max-w-md space-y-4">
