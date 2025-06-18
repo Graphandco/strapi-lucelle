@@ -1,5 +1,9 @@
 import LoginForm from "@/components/auth/LoginForm";
 
+export const metadata = {
+   title: "S'identifier | Graph and Shop",
+};
+
 export default function LoginPage() {
    return (
       <div className="wrapper py-20">

@@ -3,6 +3,10 @@
 import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/ProductCard";
 
+export const metadata = {
+   title: "Inventaire | Graph and Shop",
+};
+
 export default function Inventaire() {
    const { allProducts, categories, loading } = useProducts();
 

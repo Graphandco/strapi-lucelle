@@ -34,7 +34,7 @@ export default function Homepage() {
                   priority
                />
             )}
-            <div className="text-primary/50">
+            <div className="text-primary/50 text-lg font-base">
                Bienvenue {user?.user?.username} !
             </div>
             <div className="text-white text-sm">

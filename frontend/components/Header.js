@@ -16,7 +16,10 @@ export default function Header() {
       <header className="bg-black">
          <div className="container py-4">
             <nav className="flex items-center justify-between">
-               <Link href="/" className="flex items-center gap-2 font-bold">
+               <Link
+                  href="/"
+                  className="flex items-center gap-3 font-base text-white text-lg"
+               >
                   <Image
                      src="/logo.svg"
                      alt="Shopping List"
