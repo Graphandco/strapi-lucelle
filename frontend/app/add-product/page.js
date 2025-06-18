@@ -3,29 +3,15 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { addProduct } from "@/actions/addProduct";
-import { getCategories } from "@/actions/categories";
 
 export default function AddProduct() {
    const { user } = useAuth();
-   const { refreshProducts } = useProducts();
+   const { refreshProducts, categories } = useProducts();
    const router = useRouter();
-   const [categories, setCategories] = useState([]);
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
-
-   useEffect(() => {
-      const loadCategories = async () => {
-         try {
-            const data = await getCategories();
-            setCategories(data);
-         } catch (error) {
-            console.error("Erreur lors du chargement des catégories:", error);
-         }
-      };
-      loadCategories();
-   }, []);
 
    async function handleSubmit(event) {
       event.preventDefault();

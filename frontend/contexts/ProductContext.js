@@ -2,16 +2,19 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { getStrapiProducts } from "@/actions/getProducts";
+import { getCategories } from "@/actions/categories";
 
 const ProductContext = createContext();
 
 export function ProductProvider({ children }) {
    const [allProducts, setAllProducts] = useState([]);
+   const [categories, setCategories] = useState([]);
    const [loading, setLoading] = useState(true);
 
-   // Charger les produits au montage du composant
+   // Charger les produits et catégories au montage du composant
    useEffect(() => {
       loadAllProducts();
+      loadAllCategories();
    }, []);
 
    const loadAllProducts = async () => {
@@ -26,6 +29,19 @@ export function ProductProvider({ children }) {
          console.error("Error loading products:", error);
       } finally {
          setLoading(false);
+      }
+   };
+
+   const loadAllCategories = async () => {
+      try {
+         const data = await getCategories();
+         // Trier les catégories par nom
+         const sortedData = data.sort((a, b) =>
+            a.name.localeCompare(b.name, "fr", { sensitivity: "base" })
+         );
+         setCategories(sortedData);
+      } catch (error) {
+         console.error("Error loading categories:", error);
       }
    };
 
@@ -196,12 +212,14 @@ export function ProductProvider({ children }) {
 
    const value = {
       allProducts,
+      categories,
       loading,
       updateProductInCart,
       updateProductToBuy,
       updateProductQuantity,
       deleteProduct,
       refreshProducts: loadAllProducts,
+      refreshCategories: loadAllCategories,
    };
 
    return (

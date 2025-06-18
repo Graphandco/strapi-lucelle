@@ -1,21 +1,10 @@
 "use client";
 
-import { getCategories } from "@/actions/categories";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/ProductCard";
-import { useEffect, useState } from "react";
 
 export default function Inventaire() {
-   const { allProducts, loading } = useProducts();
-   const [categories, setCategories] = useState([]);
-
-   useEffect(() => {
-      const loadCategories = async () => {
-         const data = await getCategories();
-         setCategories(data);
-      };
-      loadCategories();
-   }, []);
+   const { allProducts, categories, loading } = useProducts();
 
    if (loading) {
       return <div>Chargement...</div>;

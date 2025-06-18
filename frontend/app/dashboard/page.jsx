@@ -4,8 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useProducts } from "@/contexts/ProductContext";
-import { getCategories } from "@/actions/categories";
-import { useEffect, useState } from "react";
 import { Trash } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -23,18 +21,9 @@ import {
 export default function DashboardPage() {
    const { user, logout } = useAuth();
    const router = useRouter();
-   const { allProducts, deleteProduct } = useProducts();
+   const { allProducts, categories, deleteProduct } = useProducts();
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    const productsInCart = allProducts.filter((product) => product.isInCart);
-   const [categories, setCategories] = useState([]);
-
-   useEffect(() => {
-      const loadCategories = async () => {
-         const data = await getCategories();
-         setCategories(data);
-      };
-      loadCategories();
-   }, []);
 
    const avatarUrl = user?.user?.avatar?.url
       ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${user.user.avatar.url}`

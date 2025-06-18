@@ -1,10 +1,9 @@
 "use client";
 
-import { getCategories } from "@/actions/categories";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/ProductCard";
-import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 import {
    Accordion,
    AccordionContent,
@@ -29,31 +28,14 @@ import SearchBar from "@/components/SearchBar";
 export default function ShoppingList() {
    const {
       allProducts,
+      categories,
       updateProductToBuy,
       updateProductInCart,
       updateProductQuantity,
       loading,
    } = useProducts();
    const { user } = useAuth();
-   const [categories, setCategories] = useState([]);
    const [isClearing, setIsClearing] = useState(false);
-   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-
-   useEffect(() => {
-      const loadCategories = async () => {
-         try {
-            setIsLoadingCategories(true);
-            const data = await getCategories();
-            setCategories(data);
-         } catch (error) {
-            console.error("Erreur lors du chargement des catégories:", error);
-            toast.error("Erreur lors du chargement des catégories");
-         } finally {
-            setIsLoadingCategories(false);
-         }
-      };
-      loadCategories();
-   }, []);
 
    // Filtrer les produits qui sont à acheter
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
@@ -102,7 +84,7 @@ export default function ShoppingList() {
       }
    };
 
-   if (loading || isLoadingCategories) {
+   if (loading) {
       return (
          <div className="container flex items-center justify-center min-h-screen">
             <div className="text-white">Chargement...</div>
