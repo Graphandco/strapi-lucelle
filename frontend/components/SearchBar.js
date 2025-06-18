@@ -12,18 +12,32 @@ export default function SearchBar() {
    const [searchTerm, setSearchTerm] = useState("");
    const [filteredProducts, setFilteredProducts] = useState([]);
 
+   // Fonction pour normaliser le texte (retirer accents, caractères spéciaux, etc.)
+   const normalizeText = (text) => {
+      return text
+         .toLowerCase()
+         .normalize("NFD")
+         .replace(/[\u0300-\u036f]/g, "") // Retire les accents
+         .replace(/[^a-z0-9\s]/g, "") // Garde seulement lettres, chiffres et espaces
+         .replace(/\s+/g, " ") // Remplace les espaces multiples par un seul
+         .trim();
+   };
+
    useEffect(() => {
       if (searchTerm.trim() === "") {
          setFilteredProducts([]);
          return;
       }
 
+      const normalizedSearchTerm = normalizeText(searchTerm);
+
       const filtered = allProducts
          .filter((product) => !product.isToBuy)
-         .filter((product) =>
-            product.name.toLowerCase().includes(searchTerm.toLowerCase())
-         )
-         .slice(0, 3); // Limite à 3 produits
+         .filter((product) => {
+            const normalizedProductName = normalizeText(product.name);
+            return normalizedProductName.includes(normalizedSearchTerm);
+         })
+         .slice(0, 5); // Limite à 5 produits
       setFilteredProducts(filtered);
    }, [searchTerm, allProducts]);
 
@@ -44,7 +58,7 @@ export default function SearchBar() {
          />
          {filteredProducts.length > 0 && (
             <div className="my-3 rounded-lg px-3 z-10">
-               <ul className="py-2 flex items-center gap-7">
+               <ul className="py-2 flex flex-wrap items-center gap-7">
                   {filteredProducts.map((product) => {
                      const productImage = product.image?.formats?.thumbnail?.url
                         ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${product.image.formats.thumbnail.url}`
@@ -54,7 +68,7 @@ export default function SearchBar() {
                         <li
                            key={product.documentId}
                            onClick={() => handleProductClick(product)}
-                           className="hover:bg-primary/10 cursor-pointer text-white flex flex-col items-center gap-2"
+                           className="cursor-pointer text-white flex flex-col items-center gap-2"
                         >
                            <Image
                               src={

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import SearchBar from "@/components/SearchBar";
+import Image from "next/image";
 
 export default function ShoppingList() {
    const {
@@ -101,45 +102,39 @@ export default function ShoppingList() {
             </span>
          </h1>
          <SearchBar />
-         <div className="grid gap-8">
-            {/* Liste des produits non dans le panier, triés par catégorie */}
-            <div className="bg-card rounded-lg px-3 pb-1">
-               {categories.map((category) => {
-                  const productsInCategory = productsNotInCart.filter(
-                     (product) => product.category?.id === category.id
-                  );
+         {productsToBuy.length === 0 ? (
+            <>
+               <p className="text-center text-white">
+                  Aucun produit dans la liste !
+               </p>
+               <Image
+                  src="/empty-cart.png"
+                  alt="Caddie vide"
+                  width={150}
+                  height={150}
+                  className="mx-auto mt-5"
+                  priority
+               />
+            </>
+         ) : (
+            <div className="grid gap-8">
+               {/* Liste des produits non dans le panier, triés par catégorie */}
+               {productsNotInCart.length > 0 && (
+                  <div className="bg-card rounded-lg px-3 pb-1">
+                     {categories.map((category) => {
+                        const productsInCategory = productsNotInCart.filter(
+                           (product) => product.category?.id === category.id
+                        );
 
-                  if (productsInCategory.length === 0) return null;
+                        if (productsInCategory.length === 0) return null;
 
-                  return (
-                     <div key={category.id} className="mt-3">
-                        <h3 className="text-sm text-bg mb-2 text-primary/50">
-                           {category.name}
-                        </h3>
-                        <ul className="pb-2">
-                           {productsInCategory.map((product) => (
-                              <ProductCard
-                                 key={product.documentId}
-                                 product={product}
-                                 pageType="shopping-list"
-                              />
-                           ))}
-                        </ul>
-                     </div>
-                  );
-               })}
-            </div>
-
-            {/* Liste des produits dans le panier */}
-            {productsInCart.length > 0 && (
-               <div>
-                  <Accordion type="single" collapsible>
-                     <AccordionItem value="item-1">
-                        <AccordionTrigger>Déjà dans le panier</AccordionTrigger>
-                        <AccordionContent className="text-center">
-                           <>
-                              <ul className="bg-card rounded-lg px-3 py-2">
-                                 {productsInCart.map((product) => (
+                        return (
+                           <div key={category.id} className="mt-3">
+                              <h3 className="text-sm text-bg mb-2 text-primary/50">
+                                 {category.name}
+                              </h3>
+                              <ul className="pb-2">
+                                 {productsInCategory.map((product) => (
                                     <ProductCard
                                        key={product.documentId}
                                        product={product}
@@ -147,55 +142,81 @@ export default function ShoppingList() {
                                     />
                                  ))}
                               </ul>
+                           </div>
+                        );
+                     })}
+                  </div>
+               )}
 
-                              <AlertDialog>
-                                 <AlertDialogTrigger asChild>
-                                    <div className="mt-4">
-                                       <div
-                                          className="rounded-lg text-sm text-black disabled:opacity-50 bg-primary py-2 px-6 inline-flex items-center gap-2 cursor-pointer hover:bg-primary-dark transition-colors"
-                                          role="button"
-                                          tabIndex={0}
-                                          disabled={isClearing}
-                                       >
-                                          {isClearing ? (
-                                             "Vidage en cours..."
-                                          ) : (
-                                             <>
-                                                <Recycle size={20} /> Vider
-                                             </>
-                                          )}
+               {/* Liste des produits dans le panier */}
+               {productsInCart.length > 0 && (
+                  <div>
+                     <Accordion type="single" collapsible>
+                        <AccordionItem value="item-1">
+                           <AccordionTrigger>
+                              Déjà dans le panier
+                           </AccordionTrigger>
+                           <AccordionContent className="text-center">
+                              <>
+                                 <ul className="bg-card rounded-lg px-3 py-2">
+                                    {productsInCart.map((product) => (
+                                       <ProductCard
+                                          key={product.documentId}
+                                          product={product}
+                                          pageType="shopping-list"
+                                       />
+                                    ))}
+                                 </ul>
+
+                                 <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                       <div className="mt-4">
+                                          <div
+                                             className="rounded-lg text-sm text-black disabled:opacity-50 bg-primary py-2 px-6 inline-flex items-center gap-2 cursor-pointer hover:bg-primary-dark transition-colors"
+                                             role="button"
+                                             tabIndex={0}
+                                             disabled={isClearing}
+                                          >
+                                             {isClearing ? (
+                                                "Vidage en cours..."
+                                             ) : (
+                                                <>
+                                                   <Recycle size={20} /> Vider
+                                                </>
+                                             )}
+                                          </div>
                                        </div>
-                                    </div>
-                                 </AlertDialogTrigger>
-                                 <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                       <AlertDialogTitle>
-                                          Vider tout le panier?
-                                       </AlertDialogTitle>
-                                       <AlertDialogDescription>
-                                          Les produits seront remis dans
-                                          l'inventaire.
-                                       </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                       <AlertDialogCancel>
-                                          Annuler
-                                       </AlertDialogCancel>
-                                       <AlertDialogAction
-                                          onClick={handleClearCart}
-                                       >
-                                          Continuer
-                                       </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                 </AlertDialogContent>
-                              </AlertDialog>
-                           </>
-                        </AccordionContent>
-                     </AccordionItem>
-                  </Accordion>
-               </div>
-            )}
-         </div>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                       <AlertDialogHeader>
+                                          <AlertDialogTitle>
+                                             Vider tout le panier?
+                                          </AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                             Les produits seront remis dans
+                                             l'inventaire.
+                                          </AlertDialogDescription>
+                                       </AlertDialogHeader>
+                                       <AlertDialogFooter>
+                                          <AlertDialogCancel>
+                                             Annuler
+                                          </AlertDialogCancel>
+                                          <AlertDialogAction
+                                             onClick={handleClearCart}
+                                          >
+                                             Continuer
+                                          </AlertDialogAction>
+                                       </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                 </AlertDialog>
+                              </>
+                           </AccordionContent>
+                        </AccordionItem>
+                     </Accordion>
+                  </div>
+               )}
+            </div>
+         )}
       </div>
    );
 }
