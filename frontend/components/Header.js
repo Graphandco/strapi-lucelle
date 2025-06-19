@@ -13,7 +13,7 @@ export default function Header() {
       : null;
 
    return (
-      <header className="bg-black">
+      <header className="bg-headerfooter">
          <div className="container py-4">
             <nav className="flex items-center justify-between">
                <Link

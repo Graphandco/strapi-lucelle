@@ -5,6 +5,7 @@
 
 @theme inline {
    --font-jost: var(--font-jost);
+   --color-headerfooter: var(--headerfooter);
    --radius-sm: calc(var(--radius) - 4px);
    --radius-md: calc(var(--radius) - 2px);
    --radius-lg: var(--radius);
@@ -44,6 +45,7 @@
 }
 
 :root {
+   --headerfooter: #222;
    --background: #18191c;
    --foreground: oklch(0.8 0 0);
    /* --card: #131313; */
