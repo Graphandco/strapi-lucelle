@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/accordion";
 import { Recycle } from "lucide-react";
 import ConfirmAlert from "@/components/ConfirmAlert";
-import { toast } from "sonner";
 
 export default function ShoppingList() {
    const {
@@ -71,7 +70,6 @@ export default function ShoppingList() {
          console.error("Erreur lors du vidage du panier:", error);
       } finally {
          setIsClearing(false);
-         toast.success("Le panier a été vidé !");
       }
    };
 

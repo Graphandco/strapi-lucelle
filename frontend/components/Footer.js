@@ -12,10 +12,10 @@ export default function Footer() {
 
    return (
       <footer className="fixed z-10 bottom-0 left-0 w-full bg-headerfooter px-3 pt-3 pb-2">
-         <div className=" mx-auto flex justify-around items-center">
+         <div className=" mx-auto grid grid-cols-4 items-center justify-center">
             <Link
                href="/"
-               className={`flex flex-col items-center px-2 ${
+               className={`flex flex-col items-center px-2 border-r border-white/10 ${
                   pathname === "/" ? "text-primary" : "text-white"
                }`}
             >
@@ -24,7 +24,7 @@ export default function Footer() {
             </Link>
             <Link
                href="/shopping-list"
-               className={`flex flex-col items-center px-2 ${
+               className={`flex flex-col items-center px-2 border-r border-white/10 ${
                   pathname === "/shopping-list" ? "text-primary" : "text-white"
                }`}
             >
@@ -33,7 +33,7 @@ export default function Footer() {
             </Link>
             <Link
                href="/inventaire"
-               className={`flex flex-col items-center px-2 ${
+               className={`flex flex-col items-center px-2 border-r border-white/10 ${
                   pathname === "/inventaire" ? "text-primary" : "text-white"
                }`}
             >
