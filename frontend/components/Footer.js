@@ -11,7 +11,7 @@ export default function Footer() {
    if (!user) return null;
 
    return (
-      <footer className="fixed z-10 bottom-0 left-0 w-full bg-headerfooter px-3 pt-3 pb-2">
+      <footer className="fixed z-10 bottom-0 left-0 w-full bg-headerfooter pt-3 pb-2">
          <div className=" mx-auto grid grid-cols-4 items-center justify-center">
             <Link
                href="/"
