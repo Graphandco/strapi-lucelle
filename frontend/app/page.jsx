@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/products/ProductCard";
 import Image from "next/image";
 
 export default function Homepage() {
@@ -34,7 +34,7 @@ export default function Homepage() {
                   priority
                />
             )}
-            <div className="text-primary/50 text-lg font-base">
+            <div className="text-primary text-lg font-base">
                Bienvenue {user?.user?.username} !
             </div>
             <div className="text-white text-sm">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useProducts } from "@/contexts/ProductContext";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/products/ProductCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import {
@@ -23,7 +23,7 @@ import {
    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/products/SearchBar";
 import Image from "next/image";
 
 // export const metadata = {
@@ -99,7 +99,7 @@ export default function ShoppingList() {
 
    return (
       <div className="">
-         <h1 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
+         <h1 className="text-2xl mb-3 px-1 text-primary flex items-center gap-2">
             Liste de courses
             <span className="text-base text-white mt-1">
                ({productsNotInCart.length})

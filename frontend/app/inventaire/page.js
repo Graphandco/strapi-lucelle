@@ -1,7 +1,7 @@
 "use client";
 
 import { useProducts } from "@/contexts/ProductContext";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/products/ProductCard";
 
 // export const metadata = {
 //    title: "Inventaire | Graph and Shop",
@@ -19,7 +19,7 @@ export default function Inventaire() {
          <div className="grid gap-8">
             {/* Liste des produits triés par catégorie */}
             <div>
-               <h1 className="text-2xl mb-3 px-1 text-primary/50 flex items-center gap-2">
+               <h1 className="text-2xl mb-3 px-1 text-primary flex items-center gap-2">
                   Inventaire
                   <span className="text-base text-white mt-1">
                      ({allProducts.length})
