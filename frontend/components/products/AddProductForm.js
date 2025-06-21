@@ -121,7 +121,7 @@ export default function AddProductForm() {
          <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-black py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
+            className="w-full font-normal bg-primary text-black py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
          >
             {loading ? "Ajout en cours..." : "Ajouter"}
          </button>

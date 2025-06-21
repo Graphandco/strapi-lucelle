@@ -166,7 +166,7 @@ export default function ShoppingList() {
                                  >
                                     <div className="mt-4">
                                        <div
-                                          className="rounded-lg text-sm text-black disabled:opacity-50 bg-primary py-2 px-6 inline-flex items-center gap-2 cursor-pointer hover:bg-primary-dark transition-colors"
+                                          className="rounded-lg text-sm font-normal text-black disabled:opacity-50 bg-primary py-2 px-6 inline-flex items-center gap-2 cursor-pointer hover:bg-primary-dark transition-colors"
                                           role="button"
                                           tabIndex={0}
                                           disabled={isClearing}
