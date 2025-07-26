@@ -24,11 +24,23 @@ import {
 } from "@/components/ui/chart";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, PlusIcon } from "lucide-react";
+import ListePoids from "./ListePoids";
+import AddWeightForm from "./AddWeightForm";
+import { Button } from "@/components/ui/button";
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function StatsPoids() {
    const { allWeights, loading } = useWeights();
    const { poids, date } = allWeights;
+   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
    // Calcule le mois en cours pour l'état initial
    const getCurrentMonthIndex = () => {
@@ -111,23 +123,9 @@ export default function StatsPoids() {
    // Crée des ticks personnalisés pour les mois avec largeur égale
    const monthTicks = currentQuarterMonths.map((monthKey, index) => {
       const currentDate = new Date(monthKey + "-01");
-      const monthNames = [
-         "Janvier",
-         "Février",
-         "Mars",
-         "Avril",
-         "Mai",
-         "Juin",
-         "Juillet",
-         "Août",
-         "Septembre",
-         "Octobre",
-         "Novembre",
-         "Décembre",
-      ];
       return {
          value: index, // Index pour espacement égal
-         label: monthNames[currentDate.getMonth()],
+         label: currentDate.toLocaleDateString("fr-FR", { month: "long" }),
       };
    });
 
@@ -157,43 +155,49 @@ export default function StatsPoids() {
 
    const getMonthLabel = (month) => {
       const year = new Date(allWeights[0]?.date || new Date()).getFullYear();
-      const monthNames = [
-         "Janvier",
-         "Février",
-         "Mars",
-         "Avril",
-         "Mai",
-         "Juin",
-         "Juillet",
-         "Août",
-         "Septembre",
-         "Octobre",
-         "Novembre",
-         "Décembre",
-      ];
-      const startMonthName = monthNames[month];
-      const endMonthName = monthNames[Math.min(month + 1, 11)]; // +1 pour le 2ème mois
-      return `${startMonthName} - ${endMonthName} ${year}`;
-   };
+      const startDate = new Date(year, month, 1);
+      const endDate = new Date(year, Math.min(month + 1, 11), 1);
 
-   console.log("sortedWeights:", sortedWeights);
-   console.log(
-      "Timestamps:",
-      sortedWeights.map((w) => ({ date: w.date, timestamp: w.timestamp }))
-   );
+      const startMonth = startDate.toLocaleDateString("fr-FR", {
+         month: "long",
+      });
+      const endMonth = endDate.toLocaleDateString("fr-FR", { month: "long" });
+
+      return `${startMonth} - ${endMonth} ${year}`;
+   };
 
    return (
       <div>
-         <h1 className="text-2xl mb-3 px-1 text-primary flex items-center gap-2">
-            Statistiques de poids
-         </h1>
+         <div className="flex justify-between items-center mb-5">
+            <h1 className="text-2xl pb-5 px-1 text-primary flex items-center gap-2">
+               Statistiques de poids
+            </h1>
 
-         {/* Navigation des trimestres */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+               <DialogTrigger asChild>
+                  <Button className="bg-primary  hover:bg-primary/90">
+                     <PlusIcon className="w-4 h-4 mr-2" />
+                     Ajouter une mesure
+                  </Button>
+               </DialogTrigger>
+               <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                     <DialogTitle>Ajouter une mesure de poids</DialogTitle>
+                     <DialogDescription>
+                        Saisissez votre poids et la date de mesure.
+                     </DialogDescription>
+                  </DialogHeader>
+                  <AddWeightForm onSuccess={() => setIsDialogOpen(false)} />
+               </DialogContent>
+            </Dialog>
+         </div>
+
+         {/* Navigation des mois */}
          <div className="flex items-center justify-between mb-4">
             <button
                onClick={goToPreviousMonth}
                disabled={currentMonth === 0}
-               className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90"
+               className="bg-primary text-black py-2 px-4 rounded-md hover:bg-primary/90"
             >
                <ArrowLeftIcon className="w-4 h-4" />
             </button>
@@ -203,7 +207,7 @@ export default function StatsPoids() {
             <button
                onClick={goToNextMonth}
                disabled={currentMonth === 10}
-               className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90"
+               className="bg-primary text-black py-2 px-4 rounded-md hover:bg-primary/90"
             >
                <ArrowRightIcon className="w-4 h-4" />
             </button>
@@ -265,13 +269,7 @@ export default function StatsPoids() {
             </Card>
          </div>
 
-         {/* Liste brute (optionnelle) */}
-         {allWeights.map((weight) => (
-            <div key={weight.id}>
-               <p>{weight.poids}</p>
-               <p>{weight.date}</p>
-            </div>
-         ))}
+         <ListePoids allWeights={allWeights} />
       </div>
    );
 }

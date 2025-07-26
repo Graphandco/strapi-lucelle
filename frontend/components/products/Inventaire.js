@@ -3,7 +3,7 @@
 import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/products/ProductCard";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, PlusCircle } from "lucide-react";
 
 export default function Inventaire() {
    const { allProducts, categories, loading } = useProducts();
@@ -25,7 +25,7 @@ export default function Inventaire() {
                href="/add-product"
                className="flex flex-col items-center px-2 "
             >
-               <Plus size={22} className="" />
+               <PlusCircle size={26} className="" />
             </Link>
          </div>
          {categories.map((category) => {
