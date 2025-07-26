@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "weights",
+  "info": {
+    "singularName": "weight",
+    "pluralName": "weights",
+    "displayName": "Poids",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "date": {
+      "type": "date"
+    },
+    "poids": {
+      "type": "decimal"
+    }
+  }
+}

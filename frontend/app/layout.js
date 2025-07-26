@@ -3,6 +3,7 @@ import { Inter, Jost } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProductProvider } from "@/contexts/ProductContext";
+import { WeightProvider } from "@/contexts/WeightContext";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
@@ -32,10 +33,12 @@ export default function RootLayout({ children }) {
          <body className={`${jost.variable}`}>
             <AuthProvider>
                <ProductProvider>
-                  <Header />
-                  <main className="container pt-5 pb-20">{children}</main>
-                  <Footer />
-                  <Toaster position="top-center" />
+                  <WeightProvider>
+                     <Header />
+                     <main className="container pt-5 pb-20">{children}</main>
+                     <Footer />
+                     <Toaster position="top-center" />
+                  </WeightProvider>
                </ProductProvider>
             </AuthProvider>
          </body>
