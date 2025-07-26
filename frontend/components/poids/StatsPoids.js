@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/chart";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 
 export default function StatsPoids() {
    const { allWeights, loading } = useWeights();
@@ -192,9 +193,9 @@ export default function StatsPoids() {
             <button
                onClick={goToPreviousMonth}
                disabled={currentMonth === 0}
-               className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+               className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90"
             >
-               ← Précédent
+               <ArrowLeftIcon className="w-4 h-4" />
             </button>
             <span className="text-lg font-semibold">
                {getMonthLabel(currentMonth)}
@@ -202,22 +203,22 @@ export default function StatsPoids() {
             <button
                onClick={goToNextMonth}
                disabled={currentMonth === 10}
-               className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+               className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90"
             >
-               Suivant →
+               <ArrowRightIcon className="w-4 h-4" />
             </button>
          </div>
 
          {/* Graphique Shadcn/ui Chart */}
-         <div className="mb-8">
-            <Card>
+         <div className="mb-8 w-full">
+            <Card className="w-full">
                <CardHeader>
                   <CardTitle>Suivi de poids</CardTitle>
                   <CardDescription>
                      Évolution du poids dans le temps
                   </CardDescription>
                </CardHeader>
-               <CardContent>
+               <CardContent className="w-full">
                   <ChartContainer
                      data={sortedWeights}
                      config={{
@@ -226,7 +227,7 @@ export default function StatsPoids() {
                            color: "hsl(var(--chart-1))",
                         },
                      }}
-                     className="h-[300px]"
+                     className="h-[300px] w-full"
                   >
                      <RechartsLineChart data={sortedWeights}>
                         <CartesianGrid strokeDasharray="3 3" />

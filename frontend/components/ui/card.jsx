@@ -65,7 +65,7 @@ function CardContent({ className, ...props }) {
    return (
       <div
          data-slot="card-content"
-         className={cn("px-0", className)}
+         className={cn("pr-2", className)}
          {...props}
       />
    );

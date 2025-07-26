@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { ShoppingCart, Store, CirclePlus, Home } from "lucide-react";
+import { ShoppingCart, Store, CirclePlus, Home, Weight } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
@@ -41,13 +41,13 @@ export default function Footer() {
                <span className="text-[12px]">Inventaire</span>
             </Link>
             <Link
-               href="/add-product"
+               href="/suivi-poids"
                className={`flex flex-col items-center px-2 ${
-                  pathname === "/add-product" ? "text-primary" : "text-white"
+                  pathname === "/suivi-poids" ? "text-primary" : "text-white"
                }`}
             >
-               <CirclePlus size={22} className="z-10" />
-               <span className="text-[12px]">Ajouter</span>
+               <Weight size={22} className="z-10" />
+               <span className="text-[12px]">Poids</span>
             </Link>
 
             {/* <Link

@@ -2,6 +2,8 @@
 
 import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/products/ProductCard";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export default function Inventaire() {
    const { allProducts, categories, loading } = useProducts();
@@ -12,12 +14,20 @@ export default function Inventaire() {
 
    return (
       <div>
-         <h1 className="text-2xl mb-3 px-1 text-primary flex items-center gap-2">
-            Inventaire
-            <span className="text-base text-white mt-1">
-               ({allProducts.length})
-            </span>
-         </h1>
+         <div className="flex justify-between items-center">
+            <h1 className="text-2xl mb-3 px-1 text-primary flex items-center gap-2">
+               Inventaire
+               <span className="text-base text-white mt-1">
+                  ({allProducts.length})
+               </span>
+            </h1>
+            <Link
+               href="/add-product"
+               className="flex flex-col items-center px-2 "
+            >
+               <Plus size={22} className="" />
+            </Link>
+         </div>
          {categories.map((category) => {
             const productsInCategory = allProducts.filter(
                (product) => product.category?.id === category.id
