@@ -137,10 +137,8 @@ export default function StatsPoids() {
 
    // Fonction de formatage pour le tooltip
    const formatTooltip = (value, name, props) => {
-      const firstDate = new Date(allWeights[0].date);
-      const currentDate = new Date(
-         firstDate.getTime() + props.payload.timestamp * 24 * 60 * 60 * 1000
-      );
+      // Utilise directement la date de l'entrée de poids
+      const currentDate = new Date(props.payload.date);
       return [`${format(currentDate, "dd/MM/yyyy")} : ${value} kg`, ""];
    };
 
