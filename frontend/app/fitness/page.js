@@ -59,13 +59,13 @@ export default function Fitness() {
                               className="mx-auto"
                            />
                         </div>
-                        <div className="flex items-center justify-between px-2">
+                        {/* <div className="flex items-center justify-between px-2">
                            <span className="text-sm text-muted-foreground">
                               {corpsCounts[corps] || 0} exercice
                               {(corpsCounts[corps] || 0) > 1 ? "s" : ""}
                            </span>
                            <ArrowRightIcon className="w-5 h-5 text-primary" />
-                        </div>
+                        </div> */}
                      </CardContent>
                   </Card>
                </Link>

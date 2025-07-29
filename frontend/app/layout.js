@@ -31,7 +31,9 @@ export default function RootLayout({ children }) {
             <link rel="icon" href="/logo512.png" />
             <meta name="theme-color" content="#ffffff" />
          </head>
-         <body className={`${jost.variable} flex flex-col justify-between`}>
+         <body
+            className={`${jost.variable} flex flex-col justify-between pb-24`}
+         >
             <AuthProvider>
                <ProductProvider>
                   <WeightProvider>

@@ -51,50 +51,48 @@ export default function Chronometre() {
    };
 
    return (
-      <div className="pb-20">
-         <Card className="w-full mx-auto">
-            {/* <CardHeader>
+      <Card className="px-2 w-full mx-auto">
+         {/* <CardHeader>
             <CardTitle className="text-center">Chronomètre</CardTitle>
          </CardHeader> */}
-            <CardContent className="flex justify-between">
-               {/* Affichage du temps */}
-               <div className="text-center">
-                  <div className="text-4xl font-mono font-bold text-primary">
-                     {formatTime(time)}
-                  </div>
+         <CardContent className="flex justify-between">
+            {/* Affichage du temps */}
+            <div className="text-center">
+               <div className="text-4xl font-mono font-bold text-primary">
+                  {formatTime(time)}
                </div>
+            </div>
 
-               {/* Boutons de contrôle */}
-               <div className="flex justify-center gap-4">
-                  {!isRunning ? (
-                     <Button
-                        onClick={startTimer}
-                        className="bg-green-600 hover:bg-green-700"
-                        size="lg"
-                     >
-                        <PlayIcon className="w-5 h-5" />
-                     </Button>
-                  ) : (
-                     <Button
-                        onClick={pauseTimer}
-                        className="bg-yellow-600 hover:bg-yellow-700"
-                        size="lg"
-                     >
-                        <PauseIcon className="w-5 h-5" />
-                     </Button>
-                  )}
-
+            {/* Boutons de contrôle */}
+            <div className="flex justify-center gap-4">
+               {!isRunning ? (
                   <Button
-                     onClick={resetTimer}
-                     variant="outline"
+                     onClick={startTimer}
+                     className="bg-green-600 hover:bg-green-700"
                      size="lg"
-                     className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
                   >
-                     <RotateCcwIcon className="w-5 h-5" />
+                     <PlayIcon className="w-5 h-5" />
                   </Button>
-               </div>
-            </CardContent>
-         </Card>
-      </div>
+               ) : (
+                  <Button
+                     onClick={pauseTimer}
+                     className="bg-yellow-600 hover:bg-yellow-700"
+                     size="lg"
+                  >
+                     <PauseIcon className="w-5 h-5" />
+                  </Button>
+               )}
+
+               <Button
+                  onClick={resetTimer}
+                  variant="outline"
+                  size="lg"
+                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+               >
+                  <RotateCcwIcon className="w-5 h-5" />
+               </Button>
+            </div>
+         </CardContent>
+      </Card>
    );
 }
