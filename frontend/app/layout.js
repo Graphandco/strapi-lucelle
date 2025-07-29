@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
             <meta name="theme-color" content="#ffffff" />
          </head>
          <body
-            className={`${jost.variable} flex flex-col justify-between pb-24`}
+            className={`${jost.variable} flex flex-col justify-between pb-20`}
          >
             <AuthProvider>
                <ProductProvider>
