@@ -247,11 +247,25 @@ export function ExerciceProvider({ children }) {
       return Array.from(corpsSet).sort();
    };
 
+   // Fonction pour obtenir les exercices par type d'exercice
+   const getExercicesByType = (typeId) => {
+      return allExercices
+         .filter((exercice) => exercice.types_d_exercice?.id === typeId)
+         .sort((a, b) => new Date(b.date) - new Date(a.date));
+   };
+
+   // Fonction pour obtenir un type d'exercice par ID
+   const getExerciceTypeById = (typeId) => {
+      return exerciceTypes.find((type) => type.id === typeId);
+   };
+
    const value = {
       allExercices,
       exerciceTypes,
       loading,
       getUniqueCorps,
+      getExercicesByType,
+      getExerciceTypeById,
       // updateProductInCart,
       // updateProductToBuy,
       // updateProductQuantity,

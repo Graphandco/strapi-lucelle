@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CorpsNavigation from "@/components/exercices/CorpsNavigation";
 import PageTitle from "@/components/PageTitle";
+import Link from "next/link";
 
 export default function CorpsPage() {
    const { corps } = useParams();
@@ -37,37 +38,28 @@ export default function CorpsPage() {
          ) : (
             <div className="grid grid-cols-2 gap-2">
                {filteredTypes.map((type) => (
-                  <Card
-                     key={type.id}
-                     className="gap-2 py-2 hover:shadow-lg transition-shadow"
-                  >
-                     <CardHeader>
-                        <CardTitle className="text-center">
-                           {type.name}
-                        </CardTitle>
-                     </CardHeader>
-                     <CardContent>
-                        {type.image && (
-                           <div className="">
-                              <Image
-                                 src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${type.image.formats.thumbnail.url}`}
-                                 alt={type.name}
-                                 width={75}
-                                 height={75}
-                                 className="mx-auto filter brightness-0 invert"
-                              />
-                           </div>
-                        )}
-                        {/* <div className="flex justify-between items-center">
-                           <span className="text-sm text-muted-foreground capitalize">
-                              {type.corps}
-                           </span>
-                           <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
-                              Voir les exercices
-                           </button>
-                        </div> */}
-                     </CardContent>
-                  </Card>
+                  <Link key={type.id} href={`/fitness/${corps}/${type.id}`}>
+                     <Card className="gap-2 py-2 hover:shadow-lg transition-shadow cursor-pointer">
+                        <CardHeader>
+                           <CardTitle className="text-center">
+                              {type.name}
+                           </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                           {type.image && (
+                              <div className="">
+                                 <Image
+                                    src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${type.image.formats.thumbnail.url}`}
+                                    alt={type.name}
+                                    width={75}
+                                    height={75}
+                                    className="mx-auto filter brightness-0 invert"
+                                 />
+                              </div>
+                           )}
+                        </CardContent>
+                     </Card>
+                  </Link>
                ))}
             </div>
          )}
