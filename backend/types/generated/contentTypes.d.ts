@@ -377,7 +377,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
     description: '';
-    displayName: 'Cat\u00E9gorie';
+    displayName: 'Cat\u00E9gorie Produits';
     pluralName: 'categories';
     singularName: 'category';
   };
@@ -398,6 +398,75 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
     produits: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'name'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiExerciceTypeExerciceType
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'exercice_types';
+  info: {
+    description: '';
+    displayName: "Types d'exercices";
+    pluralName: 'exercice-types';
+    singularName: 'exercice-type';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    exercices: Schema.Attribute.Relation<'oneToMany', 'api::exercice.exercice'>;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::exercice-type.exercice-type'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiExerciceExercice extends Struct.CollectionTypeSchema {
+  collectionName: 'exercices';
+  info: {
+    description: '';
+    displayName: 'Exercices';
+    pluralName: 'exercices';
+    singularName: 'exercice';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::exercice.exercice'
+    > &
+      Schema.Attribute.Private;
+    poids: Schema.Attribute.Decimal;
+    publishedAt: Schema.Attribute.DateTime;
+    repetitions: Schema.Attribute.Integer;
+    series: Schema.Attribute.Integer;
+    types_d_exercice: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::exercice-type.exercice-type'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -978,6 +1047,8 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::category.category': ApiCategoryCategory;
+      'api::exercice-type.exercice-type': ApiExerciceTypeExerciceType;
+      'api::exercice.exercice': ApiExerciceExercice;
       'api::product.product': ApiProductProduct;
       'api::weight.weight': ApiWeightWeight;
       'plugin::content-releases.release': PluginContentReleasesRelease;

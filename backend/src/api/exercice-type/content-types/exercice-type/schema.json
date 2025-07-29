@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "exercice_types",
+  "info": {
+    "singularName": "exercice-type",
+    "pluralName": "exercice-types",
+    "displayName": "Types d'exercices",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "exercices": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::exercice.exercice",
+      "mappedBy": "types_d_exercice"
+    },
+    "name": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name"
+    }
+  }
+}

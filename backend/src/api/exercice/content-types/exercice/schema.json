@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "exercices",
+  "info": {
+    "singularName": "exercice",
+    "pluralName": "exercices",
+    "displayName": "Exercices",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "date": {
+      "type": "date"
+    },
+    "series": {
+      "type": "integer"
+    },
+    "repetitions": {
+      "type": "integer"
+    },
+    "poids": {
+      "type": "decimal"
+    },
+    "types_d_exercice": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::exercice-type.exercice-type",
+      "inversedBy": "exercices"
+    }
+  }
+}

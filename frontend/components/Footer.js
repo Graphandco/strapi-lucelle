@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { ShoppingCart, Store, CirclePlus, Home, Weight } from "lucide-react";
+import {
+   ShoppingCart,
+   Store,
+   CirclePlus,
+   Home,
+   Weight,
+   BicepsFlexed,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
@@ -12,7 +19,7 @@ export default function Footer() {
 
    return (
       <footer className="fixed z-10 bottom-0 left-0 w-full bg-headerfooter pt-3 pb-2">
-         <div className=" mx-auto grid grid-cols-4 items-center justify-center">
+         <div className=" mx-auto grid grid-cols-5 items-center justify-center">
             <Link
                href="/"
                className={`flex flex-col items-center px-2 border-r border-white/10 ${
@@ -39,6 +46,15 @@ export default function Footer() {
             >
                <Store size={22} className="" />
                <span className="text-[12px]">Inventaire</span>
+            </Link>
+            <Link
+               href="/fitness"
+               className={`flex flex-col items-center px-2 border-r border-white/10 ${
+                  pathname === "/fitness" ? "text-primary" : "text-white"
+               }`}
+            >
+               <BicepsFlexed size={22} className="" />
+               <span className="text-[12px]">Fitness</span>
             </Link>
             <Link
                href="/suivi-poids"
