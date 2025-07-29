@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
                   <WeightProvider>
                      <ExerciceProvider>
                         <Header />
-                        <main className="grow container flex flex-col justify-between pt-6 pb-20">
+                        <main className="grow container flex flex-col justify-between pt-6">
                            {children}
                         </main>
                         <Footer />
