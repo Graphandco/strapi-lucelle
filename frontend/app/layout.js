@@ -31,13 +31,15 @@ export default function RootLayout({ children }) {
             <link rel="icon" href="/logo512.png" />
             <meta name="theme-color" content="#ffffff" />
          </head>
-         <body className={`${jost.variable}`}>
+         <body className={`${jost.variable} flex flex-col justify-between`}>
             <AuthProvider>
                <ProductProvider>
                   <WeightProvider>
                      <ExerciceProvider>
                         <Header />
-                        <main className="container pt-5 pb-20">{children}</main>
+                        <main className="grow container flex flex-col justify-between pt-6 pb-20">
+                           {children}
+                        </main>
                         <Footer />
                         <Toaster position="top-center" />
                      </ExerciceProvider>

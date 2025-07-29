@@ -51,14 +51,14 @@ export default function Chronometre() {
    };
 
    return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-md mx-auto p-2">
          {/* <CardHeader>
             <CardTitle className="text-center">Chronomètre</CardTitle>
          </CardHeader> */}
-         <CardContent className="space-y-6">
+         <CardContent className="flex justify-between">
             {/* Affichage du temps */}
             <div className="text-center">
-               <div className="text-6xl font-mono font-bold text-primary mb-4">
+               <div className="text-4xl font-mono font-bold text-primary">
                   {formatTime(time)}
                </div>
             </div>

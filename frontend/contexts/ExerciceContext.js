@@ -61,9 +61,9 @@ export function ExerciceProvider({ children }) {
          const json = await response.json();
          const data = json.data || [];
 
-         // Trier les catégories par nom
+         // Trier les types d'exercices par nom
          const sortedData = data.sort((a, b) =>
-            a.title.localeCompare(b.title, "fr", { sensitivity: "base" })
+            a.name.localeCompare(b.name, "fr", { sensitivity: "base" })
          );
          setExerciceTypes(sortedData);
       } catch (error) {
@@ -236,10 +236,22 @@ export function ExerciceProvider({ children }) {
    //    }
    // };
 
+   // Fonction pour obtenir les parties du corps uniques depuis les types d'exercices
+   const getUniqueCorps = () => {
+      const corpsSet = new Set();
+      exerciceTypes.forEach((type) => {
+         if (type.corps) {
+            corpsSet.add(type.corps);
+         }
+      });
+      return Array.from(corpsSet).sort();
+   };
+
    const value = {
       allExercices,
       exerciceTypes,
       loading,
+      getUniqueCorps,
       // updateProductInCart,
       // updateProductToBuy,
       // updateProductQuantity,

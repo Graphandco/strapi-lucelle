@@ -13,17 +13,6 @@ export default function CorpsPage() {
    // Filtre les types d'exercices par partie du corps
    const filteredTypes = exerciceTypes.filter((type) => type.corps === corps);
 
-   // Mapping des noms de parties du corps
-   const corpsNames = {
-      bras: "Bras",
-      poitrine: "Poitrine",
-      dos: "Dos",
-      ventre: "Ventre",
-      jambes: "Jambes",
-   };
-
-   const corpsName = corpsNames[corps] || corps;
-
    if (loading) {
       return (
          <div className="flex justify-center items-center min-h-screen">
@@ -33,14 +22,14 @@ export default function CorpsPage() {
    }
 
    return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="">
          <div className="mb-8">
             <h1 className="text-3xl font-bold text-primary mb-2">
-               Exercices pour les {corpsName}
+               Exercices pour les <span className="capitalize">{corps}</span>
             </h1>
             <p className="text-muted-foreground">
                Découvrez tous les types d'exercices pour muscler vos{" "}
-               {corpsName.toLowerCase()}
+               <span className="capitalize">{corps}</span>
             </p>
          </div>
 
@@ -53,35 +42,37 @@ export default function CorpsPage() {
                </p>
             </div>
          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 gap-6">
                {filteredTypes.map((type) => (
                   <Card
                      key={type.id}
-                     className="hover:shadow-lg transition-shadow"
+                     className="gap-2 py-2 hover:shadow-lg transition-shadow"
                   >
                      <CardHeader>
-                        <CardTitle className="text-lg">{type.name}</CardTitle>
+                        <CardTitle className="text-center">
+                           {type.name}
+                        </CardTitle>
                      </CardHeader>
                      <CardContent>
                         {type.image && (
-                           <div className="mb-4">
+                           <div className="">
                               <Image
                                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${type.image.formats.thumbnail.url}`}
                                  alt={type.name}
-                                 width={200}
-                                 height={200}
-                                 className="w-full h-48 object-cover rounded-lg"
+                                 width={100}
+                                 height={100}
+                                 className="mx-auto filter brightness-0 invert"
                               />
                            </div>
                         )}
-                        <div className="flex justify-between items-center">
+                        {/* <div className="flex justify-between items-center">
                            <span className="text-sm text-muted-foreground capitalize">
                               {type.corps}
                            </span>
                            <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
                               Voir les exercices
                            </button>
-                        </div>
+                        </div> */}
                      </CardContent>
                   </Card>
                ))}

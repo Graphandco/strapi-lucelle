@@ -75,7 +75,7 @@ export default function ShoppingList() {
 
    if (loading) {
       return (
-         <div className="container flex items-center justify-center min-h-screen">
+         <div className="flex items-center justify-center min-h-screen">
             <div className="text-white">Chargement...</div>
          </div>
       );
