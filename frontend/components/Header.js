@@ -26,7 +26,7 @@ export default function Header() {
                      width={32}
                      height={32}
                   />
-                  Shop'& Co
+                  Graph & Co
                </Link>
 
                <div className="flex items-center gap-4">

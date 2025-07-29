@@ -418,7 +418,7 @@ export interface ApiExerciceTypeExerciceType
   };
   attributes: {
     corps: Schema.Attribute.Enumeration<
-      ['bras', 'poitrine', 'dos', 'ventre', 'jambes']
+      ['bras', 'pectauraux', 'dos', 'ventre', 'jambes']
     >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

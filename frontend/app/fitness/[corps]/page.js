@@ -42,7 +42,7 @@ export default function CorpsPage() {
                </p>
             </div>
          ) : (
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-2">
                {filteredTypes.map((type) => (
                   <Card
                      key={type.id}

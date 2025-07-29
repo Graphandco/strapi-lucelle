@@ -38,7 +38,7 @@ export default function Fitness() {
             </p>
          </div>
 
-         <div className="grid grid-cols-3 gap-6">
+         <div className="grid grid-cols-3 gap-2">
             {corpsData.map((corps) => (
                <Link key={corps} href={`/fitness/${corps}`}>
                   <Card className="py-2 gap-2 hover:shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer">
