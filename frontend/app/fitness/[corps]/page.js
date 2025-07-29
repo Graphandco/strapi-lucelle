@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CorpsNavigation from "@/components/exercices/CorpsNavigation";
+import PageTitle from "@/components/PageTitle";
 
 export default function CorpsPage() {
    const { corps } = useParams();
@@ -23,15 +24,7 @@ export default function CorpsPage() {
 
    return (
       <div className="">
-         <div className="mb-8">
-            <h1 className="text-3xl font-bold text-primary mb-2">
-               Exercices pour les <span className="capitalize">{corps}</span>
-            </h1>
-            <p className="text-muted-foreground">
-               Découvrez tous les types d'exercices pour muscler vos{" "}
-               <span className="capitalize">{corps}</span>
-            </p>
-         </div>
+         <PageTitle title={corps} className="capitalize" />
 
          <CorpsNavigation />
 
@@ -59,8 +52,8 @@ export default function CorpsPage() {
                               <Image
                                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${type.image.formats.thumbnail.url}`}
                                  alt={type.name}
-                                 width={100}
-                                 height={100}
+                                 width={75}
+                                 height={75}
                                  className="mx-auto filter brightness-0 invert"
                               />
                            </div>
