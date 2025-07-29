@@ -12,8 +12,6 @@ export default function Fitness() {
    // Récupérer les parties du corps uniques depuis Strapi
    const corpsData = getUniqueCorps();
 
-   console.log(corpsData);
-
    // Compter les exercices par partie du corps
    const corpsCounts = {};
    exerciceTypes.forEach((type) => {
@@ -24,7 +22,7 @@ export default function Fitness() {
 
    if (loading) {
       return (
-         <div className="flex justify-center items-center min-h-screen">
+         <div className="flex justify-center items-center">
             <div className="text-lg">Chargement...</div>
          </div>
       );
