@@ -34,6 +34,16 @@
     "slug": {
       "type": "uid",
       "targetField": "name"
+    },
+    "corps": {
+      "type": "enumeration",
+      "enum": [
+        "bras",
+        "poitrine",
+        "dos",
+        "ventre",
+        "jambes"
+      ]
     }
   }
 }
