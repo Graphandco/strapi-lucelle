@@ -89,7 +89,8 @@
    }
    body {
       @apply bg-background text-foreground;
-      @apply min-h-screen;
+      /* @apply min-h-screen; */
+      min-height: 100dvh;
       font-family: var(--font-jost);
       font-weight: 300;
    }
