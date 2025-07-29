@@ -206,35 +206,35 @@ export function ExerciceProvider({ children }) {
    //    }
    // };
 
-   // const deleteProduct = async (productId, token) => {
-   //    try {
-   //       // Mise à jour optimiste de l'UI
-   //       setAllProducts((prevProducts) =>
-   //          prevProducts.filter((product) => product.documentId !== productId)
-   //       );
+   const deleteExercice = async (exerciceId, token) => {
+      try {
+         // Mise à jour optimiste de l'UI
+         setAllExercices((prevExercices) =>
+            prevExercices.filter((exercice) => exercice.id !== exerciceId)
+         );
 
-   //       // Suppression dans Strapi
-   //       const response = await fetch(
-   //          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
-   //          {
-   //             method: "DELETE",
-   //             headers: {
-   //                "Content-Type": "application/json",
-   //                Authorization: `Bearer ${token}`,
-   //             },
-   //          }
-   //       );
+         // Suppression dans Strapi
+         const response = await fetch(
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exercices/${exerciceId}`,
+            {
+               method: "DELETE",
+               headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+               },
+            }
+         );
 
-   //       if (!response.ok) {
-   //          // En cas d'erreur, on revient à l'état précédent
-   //          await loadAllProducts();
-   //          throw new Error("Failed to delete product");
-   //       }
-   //    } catch (error) {
-   //       console.error("Error deleting product:", error);
-   //       throw error;
-   //    }
-   // };
+         if (!response.ok) {
+            // En cas d'erreur, on revient à l'état précédent
+            await loadAllExercices();
+            throw new Error("Failed to delete exercice");
+         }
+      } catch (error) {
+         console.error("Error deleting exercice:", error);
+         throw error;
+      }
+   };
 
    // Fonction pour obtenir les parties du corps uniques depuis les types d'exercices
    const getUniqueCorps = () => {
@@ -266,10 +266,10 @@ export function ExerciceProvider({ children }) {
       getUniqueCorps,
       getExercicesByType,
       getExerciceTypeById,
+      deleteExercice,
       // updateProductInCart,
       // updateProductToBuy,
       // updateProductQuantity,
-      // deleteProduct,
       refreshExercices: loadAllExercices,
       refreshExerciceTypes: loadAllExerciceTypes,
    };

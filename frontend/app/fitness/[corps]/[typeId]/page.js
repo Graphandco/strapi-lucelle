@@ -1,21 +1,57 @@
 "use client";
 
 import { useExercices } from "@/contexts/ExerciceContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/PageTitle";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Link from "next/link";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+} from "@/components/ui/dialog";
+import AddExerciceForm from "@/components/exercices/AddExerciceForm";
+import { useState } from "react";
 
 export default function ExerciceTypePage() {
    const { corps, typeId } = useParams();
-   const { exerciceTypes, loading, getExercicesByType, getExerciceTypeById } =
-      useExercices();
+   const { user } = useAuth();
+   const {
+      exerciceTypes,
+      loading,
+      getExercicesByType,
+      getExerciceTypeById,
+      deleteExercice,
+   } = useExercices();
+   const [isDialogOpen, setIsDialogOpen] = useState(false);
+   const [deletingId, setDeletingId] = useState(null);
 
    const exerciceType = getExerciceTypeById(parseInt(typeId));
    const exercices = getExercicesByType(parseInt(typeId));
+
+   const handleDelete = async (exerciceId) => {
+      if (!confirm("Êtes-vous sûr de vouloir supprimer cet exercice ?")) {
+         return;
+      }
+
+      setDeletingId(exerciceId);
+      try {
+         await deleteExercice(exerciceId, user.jwt);
+      } catch (error) {
+         console.error("Erreur lors de la suppression:", error);
+         alert("Erreur lors de la suppression de l'exercice");
+      } finally {
+         setDeletingId(null);
+      }
+   };
 
    if (loading) {
       return (
@@ -43,11 +79,33 @@ export default function ExerciceTypePage() {
                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
             >
                <ArrowLeftIcon className="w-4 h-4" />
-               Retour aux exercices pour les{" "}
-               <span className="capitalize">{corps}</span>
+               Exercices {corps}
             </Link>
 
-            <PageTitle title={exerciceType.name} className="capitalize" />
+            <div className="grid">
+               <PageTitle title={exerciceType.name} className="capitalize" />
+
+               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                     <Button className="bg-primary hover:bg-primary/90">
+                        <PlusIcon className="w-4 h-4 mr-2" />
+                        Ajouter un exercice
+                     </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                     <DialogHeader>
+                        <DialogTitle>Ajouter un exercice</DialogTitle>
+                        <DialogDescription>
+                           Saisissez les détails de votre exercice.
+                        </DialogDescription>
+                     </DialogHeader>
+                     <AddExerciceForm
+                        typeId={typeId}
+                        onSuccess={() => setIsDialogOpen(false)}
+                     />
+                  </DialogContent>
+               </Dialog>
+            </div>
          </div>
 
          {exercices.length === 0 ? (
@@ -82,46 +140,58 @@ export default function ExerciceTypePage() {
                         key={date}
                         className="py-2 gap-2 hover:shadow-lg transition-shadow"
                      >
-                        <CardHeader>
-                           <CardTitle className="text-lg">
-                              {format(new Date(date), "EEEE d MMMM yyyy", {
-                                 locale: fr,
-                              })}
-                           </CardTitle>
+                        <CardHeader className="px-4">
+                           <div className="flex justify-between items-center">
+                              <CardTitle className="text-lg">
+                                 {format(new Date(date), "EEEE d MMMM yyyy", {
+                                    locale: fr,
+                                 })}
+                              </CardTitle>
+                           </div>
                         </CardHeader>
-                        <CardContent className="px-2">
+                        <CardContent className="px-4">
                            <div className="space-y-3">
                               {groupedExercices[date].map((exercice) => (
                                  <div
                                     key={exercice.id}
-                                    className="grid grid-cols-3 gap-4 text-sm"
+                                    className="flex justify-between items-center"
                                  >
-                                    <div>
-                                       <span className="text-muted-foreground">
-                                          Séries:
-                                       </span>
-                                       <div className="font-semibold">
-                                          {exercice.series}
+                                    <div className="grid grid-cols-3 gap-4 text-sm flex-1">
+                                       <div>
+                                          <span className="text-muted-foreground">
+                                             Séries:
+                                          </span>
+                                          <div className="font-semibold">
+                                             {exercice.series}
+                                          </div>
+                                       </div>
+                                       <div>
+                                          <span className="text-muted-foreground">
+                                             Répétitions:
+                                          </span>
+                                          <div className="font-semibold">
+                                             {exercice.repetitions}
+                                          </div>
+                                       </div>
+                                       <div>
+                                          <span className="text-muted-foreground">
+                                             Poids:
+                                          </span>
+                                          <div className="font-semibold">
+                                             {exercice.poids
+                                                ? `${exercice.poids} kg`
+                                                : "Sans poids"}
+                                          </div>
                                        </div>
                                     </div>
-                                    <div>
-                                       <span className="text-muted-foreground">
-                                          Répétitions:
-                                       </span>
-                                       <div className="font-semibold">
-                                          {exercice.repetitions}
-                                       </div>
-                                    </div>
-                                    <div>
-                                       <span className="text-muted-foreground">
-                                          Poids:
-                                       </span>
-                                       <div className="font-semibold">
-                                          {exercice.poids
-                                             ? `${exercice.poids} kg`
-                                             : "Sans poids"}
-                                       </div>
-                                    </div>
+                                    <button
+                                       onClick={() => handleDelete(exercice.id)}
+                                       disabled={deletingId === exercice.id}
+                                       className="text-red-500 hover:text-red-700 transition-colors disabled:opacity-50 ml-4"
+                                       title="Supprimer cet exercice"
+                                    >
+                                       <Trash2Icon className="w-4 h-4" />
+                                    </button>
                                  </div>
                               ))}
                            </div>
