@@ -50,7 +50,10 @@ export default function Footer() {
             <Link
                href="/fitness"
                className={`flex flex-col items-center px-2 border-r border-white/10 ${
-                  pathname === "/fitness" ? "text-primary" : "text-white"
+                  pathname === "/fitness" ||
+                  pathname.startsWith("/fitness" + "/")
+                     ? "text-primary"
+                     : "text-white"
                }`}
             >
                <BicepsFlexed size={22} className="" />

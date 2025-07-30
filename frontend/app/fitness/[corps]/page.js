@@ -39,9 +39,9 @@ export default function CorpsPage() {
             <div className="grid grid-cols-2 gap-2">
                {filteredTypes.map((type) => (
                   <Link key={type.id} href={`/fitness/${corps}/${type.id}`}>
-                     <Card className="gap-2 py-2 hover:shadow-lg transition-shadow cursor-pointer">
+                     <Card className="h-full justify-between gap-2 py-2 hover:shadow-lg transition-shadow cursor-pointer">
                         <CardHeader>
-                           <CardTitle className="text-center">
+                           <CardTitle className="text-center font-medium">
                               {type.name}
                            </CardTitle>
                         </CardHeader>

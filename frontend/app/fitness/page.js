@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
+import PageTitle from "@/components/PageTitle";
 
 export default function Fitness() {
    const { exerciceTypes, loading, getUniqueCorps } = useExercices();
@@ -31,7 +32,7 @@ export default function Fitness() {
    return (
       <div className="">
          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-primary mb-2">Fitness</h1>
+            <PageTitle title="Fitness" />
             <p className="text-muted-foreground">
                Choisissez une partie du corps pour voir les exercices
                disponibles
@@ -39,6 +40,28 @@ export default function Fitness() {
          </div>
 
          <div className="grid grid-cols-2 gap-2">
+            <Link href="/fitness/course">
+               <Card className="py-2 gap-2 hover:shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer">
+                  <CardHeader>
+                     <CardTitle className="text-xl capitalize">
+                        Course
+                     </CardTitle>
+                  </CardHeader>
+
+                  <CardContent>
+                     <div className="pl-2">
+                        <Image
+                           src="/corps/course.png"
+                           alt="Course à pied"
+                           width={75}
+                           height={75}
+                           className="mx-auto"
+                        />
+                     </div>
+                  </CardContent>
+               </Card>
+            </Link>
+
             {corpsData.map((corps) => (
                <Link key={corps} href={`/fitness/${corps}`}>
                   <Card className="py-2 gap-2 hover:shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer">

@@ -404,6 +404,37 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
+  collectionName: 'courses';
+  info: {
+    displayName: 'Course \u00E0 pied';
+    pluralName: 'courses';
+    singularName: 'course';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date;
+    distance: Schema.Attribute.Integer;
+    duree: Schema.Attribute.Integer;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course.course'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    vitesse: Schema.Attribute.Integer;
+  };
+}
+
 export interface ApiExerciceTypeExerciceType
   extends Struct.CollectionTypeSchema {
   collectionName: 'exercice_types';
@@ -418,7 +449,7 @@ export interface ApiExerciceTypeExerciceType
   };
   attributes: {
     corps: Schema.Attribute.Enumeration<
-      ['bras', 'pectauraux', 'dos', 'ventre', 'jambes']
+      ['bras', 'pectauraux', 'dos', 'abdos', 'jambes']
     >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1050,6 +1081,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::category.category': ApiCategoryCategory;
+      'api::course.course': ApiCourseCourse;
       'api::exercice-type.exercice-type': ApiExerciceTypeExerciceType;
       'api::exercice.exercice': ApiExerciceExercice;
       'api::product.product': ApiProductProduct;

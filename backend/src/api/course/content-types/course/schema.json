@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "courses",
+  "info": {
+    "singularName": "course",
+    "pluralName": "courses",
+    "displayName": "Course à pied"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "date": {
+      "type": "date"
+    },
+    "duree": {
+      "type": "integer"
+    },
+    "distance": {
+      "type": "integer"
+    },
+    "vitesse": {
+      "type": "integer"
+    }
+  }
+}
