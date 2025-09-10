@@ -56,7 +56,7 @@ export async function login(identifier, password) {
 // Récupérer l'utilisateur actuel
 export async function getMe(jwt) {
    try {
-      const data = await strapiRequest("/users/me", {
+      const data = await strapiRequest("/users/me?populate=avatar", {
          headers: {
             Authorization: `Bearer ${jwt}`,
          },

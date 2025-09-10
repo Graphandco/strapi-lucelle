@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 export default function DashboardHeader() {
    const { user, logout } = useAuth();
    const router = useRouter();
-   const avatarUrl = user?.user?.avatar?.url
-      ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${user.user.avatar.url}`
+   const avatarUrl = user?.avatar?.url
+      ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${user.avatar.url}`
       : null;
 
    const handleLogout = () => {
@@ -29,7 +29,7 @@ export default function DashboardHeader() {
             />
          )}
          <div className="">
-            <p className="mb-4">Bienvenue {user?.user?.username} !</p>
+            <p className="mb-4">Bienvenue {user?.username} !</p>
 
             <button
                onClick={handleLogout}

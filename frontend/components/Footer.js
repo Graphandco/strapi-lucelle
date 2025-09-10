@@ -17,65 +17,61 @@ export default function Footer() {
    const pathname = usePathname();
    if (!user) return null;
 
-   return (
-      <footer className="fixed z-10 bottom-0 left-0 w-full bg-headerfooter pt-3 pb-2">
-         <div className=" mx-auto grid grid-cols-5 items-center justify-center">
-            <Link
-               href="/"
-               className={`flex flex-col items-center px-2 border-r border-white/10 ${
-                  pathname === "/" ? "text-primary" : "text-white"
-               }`}
-            >
-               <Home size={22} className="" />
-               <span className="text-[12px]">Accueil</span>
-            </Link>
-            <Link
-               href="/shopping-list"
-               className={`flex flex-col items-center px-2 border-r border-white/10 ${
-                  pathname === "/shopping-list" ? "text-primary" : "text-white"
-               }`}
-            >
-               <ShoppingCart size={22} className="" />
-               <span className="text-[12px]">Panier</span>
-            </Link>
-            <Link
-               href="/inventaire"
-               className={`flex flex-col items-center px-2 border-r border-white/10 ${
-                  pathname === "/inventaire" ? "text-primary" : "text-white"
-               }`}
-            >
-               <Store size={22} className="" />
-               <span className="text-[12px]">Inventaire</span>
-            </Link>
-            <Link
-               href="/fitness"
-               className={`flex flex-col items-center px-2 border-r border-white/10 ${
-                  pathname === "/fitness" ||
-                  pathname.startsWith("/fitness" + "/")
-                     ? "text-primary"
-                     : "text-white"
-               }`}
-            >
-               <BicepsFlexed size={22} className="" />
-               <span className="text-[12px]">Fitness</span>
-            </Link>
-            <Link
-               href="/suivi-poids"
-               className={`flex flex-col items-center px-2 ${
-                  pathname === "/suivi-poids" ? "text-primary" : "text-white"
-               }`}
-            >
-               <Weight size={22} className="z-10" />
-               <span className="text-[12px]">Poids</span>
-            </Link>
+   const links = [
+      {
+         href: "/",
+         label: "Accueil",
+         icon: Home,
+         isActive: pathname === "/",
+      },
+      {
+         href: "/shopping-list",
+         label: "Panier",
+         icon: ShoppingCart,
+         isActive: pathname === "/shopping-list",
+      },
+      {
+         href: "/inventaire",
+         label: "Inventaire",
+         icon: Store,
+         isActive: pathname === "/inventaire",
+      },
+      {
+         href: "/fitness",
+         label: "Fitness",
+         icon: BicepsFlexed,
+         isActive: pathname === "/fitness" || pathname.startsWith("/fitness/"),
+      },
+      {
+         href: "/suivi-poids",
+         label: "Poids",
+         icon: Weight,
+         isActive: pathname === "/suivi-poids",
+         isLast: true,
+      },
+   ];
 
-            {/* <Link
-               href="/dashboard"
-               className="flex flex-col items-center px-2"
-            >
-               <CircleUser className=" text-white" />
-               <span className="text-white text-[12px]">Dashboard</span>
-            </Link> */}
+   return (
+      <footer className="fixed z-10 bottom-0 left-0 w-full bg-card border-t border-white/10">
+         <div className="mx-auto grid grid-cols-5 items-center justify-center">
+            {links.map((link, index) => {
+               const IconComponent = link.icon;
+               return (
+                  <Link
+                     key={link.href}
+                     href={link.href}
+                     className={`flex flex-col items-center mx-2 pt-3 pb-2 
+                        ${!link.isLast ? "" : ""} ${
+                        link.isActive
+                           ? "text-white border-t border-white"
+                           : "text-white/30 "
+                     }`}
+                  >
+                     <IconComponent size={22} />
+                     <span className="text-[12px]">{link.label}</span>
+                  </Link>
+               );
+            })}
          </div>
       </footer>
    );

@@ -18,7 +18,7 @@ export default function Header() {
 
    return (
       <>
-         <header className="bg-headerfooter">
+         <header className="bg-card border-b border-white/10">
             <div className="container py-4">
                <nav className="flex items-center justify-between">
                   <Link
@@ -31,7 +31,7 @@ export default function Header() {
                         width={32}
                         height={32}
                      />
-                     Graph & Co
+                     Lucelle App'
                   </Link>
 
                   <div className="flex items-center gap-4">
@@ -47,11 +47,7 @@ export default function Header() {
                                  </Avatar>
                               </Link>
                            ) : (
-                              <Button
-                                 onClick={() => setIsLoginModalOpen(true)}
-                                 variant="outline"
-                                 className="text-white border-white hover:bg-white hover:text-gray-900"
-                              >
+                              <Button onClick={() => setIsLoginModalOpen(true)}>
                                  Connexion
                               </Button>
                            )}
