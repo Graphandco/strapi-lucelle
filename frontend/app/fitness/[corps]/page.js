@@ -53,7 +53,8 @@ export default function CorpsPage() {
                                     alt={type.name}
                                     width={75}
                                     height={75}
-                                    className="mx-auto filter brightness-0 invert"
+                                    // className="mx-auto filter brightness-0 invert"
+                                    className="mx-auto"
                                  />
                               </div>
                            )}

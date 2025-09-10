@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { deleteCourse as deleteCourseAction } from "../actions/deleteCourse";
 
 const ExerciceContext = createContext();
 
@@ -76,7 +77,9 @@ export function ExerciceProvider({ children }) {
    const loadAllCourses = async () => {
       try {
          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/courses?populate=*&pagination[limit]=500`,
+            `${
+               process.env.NEXT_PUBLIC_STRAPI_URL
+            }/api/courses?populate=*&pagination[limit]=500&_t=${Date.now()}`,
             {
                cache: "no-store",
             }
@@ -88,6 +91,12 @@ export function ExerciceProvider({ children }) {
 
          const json = await response.json();
          const data = json.data || [];
+
+         console.log("[loadAllCourses] Courses chargées:", data.length);
+         console.log(
+            "[loadAllCourses] IDs:",
+            data.map((course) => course.id)
+         );
 
          // Trier les courses par date (plus récent en premier)
          const sortedData = data.sort(
@@ -136,22 +145,13 @@ export function ExerciceProvider({ children }) {
             prevCourses.filter((course) => course.id !== courseId)
          );
 
-         // Suppression dans Strapi
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/courses/${courseId}`,
-            {
-               method: "DELETE",
-               headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-               },
-            }
-         );
+         // Utilisation de l'action deleteCourse
+         const result = await deleteCourseAction(courseId, token);
 
-         if (!response.ok) {
+         if (!result.success) {
             // En cas d'erreur, on revient à l'état précédent
             await loadAllCourses();
-            throw new Error("Failed to delete course");
+            throw new Error(result.error || "Failed to delete course");
          }
       } catch (error) {
          console.error("Error deleting course:", error);

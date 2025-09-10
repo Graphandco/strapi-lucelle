@@ -48,12 +48,6 @@ export default function AddCourseForm({ onSuccess }) {
       setLoading(true);
       setError(null);
 
-      if (!user?.jwt) {
-         setError("Vous devez être connecté pour ajouter une course");
-         setLoading(false);
-         return;
-      }
-
       const formData = new FormData(event.target);
       formData.append("token", user.jwt);
       formData.append("date", format(date, "yyyy-MM-dd"));
