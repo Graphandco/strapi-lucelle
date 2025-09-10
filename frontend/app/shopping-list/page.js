@@ -1,13 +1,14 @@
-import ShoppingList from "@/components/products/ShoppingList";
+"use client";
 
-export const metadata = {
-   title: "Liste de courses | Graph and Shop",
-};
+import ShoppingList from "@/components/products/ShoppingList";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function ShoppingListPage() {
    return (
-      <div className="">
-         <ShoppingList />
-      </div>
+      <ProtectedRoute>
+         <div className="">
+            <ShoppingList />
+         </div>
+      </ProtectedRoute>
    );
 }

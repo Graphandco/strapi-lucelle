@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductCard from "@/components/products/ProductCard";
 import Image from "next/image";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function Homepage() {
    const { user } = useAuth();
@@ -22,47 +23,49 @@ export default function Homepage() {
    const areProductsToBuy = productsNotInCart.length > 0;
 
    return (
-      <div className="">
-         <div className="py-3 space-y-1 text-center">
-            {areProductsToBuy && (
+      <ProtectedRoute>
+         <div className="">
+            <div className="py-3 space-y-1 text-center">
+               {areProductsToBuy && (
+                  <Image
+                     src="/full-cart.png"
+                     alt="Caddie plein"
+                     width={100}
+                     height={100}
+                     className="mx-auto"
+                     priority
+                  />
+               )}
+               <div className="text-primary text-lg font-base">
+                  Bienvenue {user?.user?.username} !
+               </div>
+               <div className="text-white text-sm">
+                  {areProductsToBuy
+                     ? `Voici la liste des ${productsNotInCart.length} produits à acheter`
+                     : "Aucun produit à acheter"}
+               </div>
+            </div>
+            {areProductsToBuy ? (
+               <ul className="bg-card rounded-lg px-3 pb-1 mt-5">
+                  {productsNotInCart.map((product) => (
+                     <ProductCard
+                        key={product.documentId}
+                        product={product}
+                        pageType="homepage"
+                     />
+                  ))}
+               </ul>
+            ) : (
                <Image
-                  src="/full-cart.png"
-                  alt="Caddie plein"
-                  width={100}
-                  height={100}
-                  className="mx-auto"
+                  src="/empty-cart.png"
+                  alt="Caddie vide"
+                  width={300}
+                  height={300}
+                  className="mx-auto mt-10"
                   priority
                />
             )}
-            <div className="text-primary text-lg font-base">
-               Bienvenue {user?.user?.username} !
-            </div>
-            <div className="text-white text-sm">
-               {areProductsToBuy
-                  ? `Voici la liste des ${productsNotInCart.length} produits à acheter`
-                  : "Aucun produit à acheter"}
-            </div>
          </div>
-         {areProductsToBuy ? (
-            <ul className="bg-card rounded-lg px-3 pb-1 mt-5">
-               {productsNotInCart.map((product) => (
-                  <ProductCard
-                     key={product.documentId}
-                     product={product}
-                     pageType="homepage"
-                  />
-               ))}
-            </ul>
-         ) : (
-            <Image
-               src="/empty-cart.png"
-               alt="Caddie vide"
-               width={300}
-               height={300}
-               className="mx-auto mt-10"
-               priority
-            />
-         )}
-      </div>
+      </ProtectedRoute>
    );
 }

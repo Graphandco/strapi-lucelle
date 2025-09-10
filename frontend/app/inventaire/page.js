@@ -1,13 +1,14 @@
-import Inventaire from "@/components/products/Inventaire";
+"use client";
 
-export const metadata = {
-   title: "Inventaire | Graph and Shop",
-};
+import Inventaire from "@/components/products/Inventaire";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function InventairePage() {
    return (
-      <div className="grid gap-8">
-         <Inventaire />
-      </div>
+      <ProtectedRoute>
+         <div className="grid gap-8">
+            <Inventaire />
+         </div>
+      </ProtectedRoute>
    );
 }

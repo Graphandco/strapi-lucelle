@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import { useState, useCallback } from "react";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function Course() {
    const { allCourses, loading, deleteCourse } = useExercices();
@@ -97,190 +98,192 @@ export default function Course() {
    }
 
    return (
-      <div>
-         <PageTitle title="Course à pied" />
+      <ProtectedRoute>
+         <div>
+            <PageTitle title="Course à pied" />
 
-         <div className="">
-            <div className="mb-6">
-               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                     <Button className="bg-primary hover:bg-primary/90">
-                        <PlusIcon className="w-4 h-4 mr-2" />
-                        Ajouter une course
-                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                     <DialogHeader>
-                        <DialogTitle>Ajouter une course</DialogTitle>
-                        <DialogDescription>
-                           Saisissez au moins 2 valeurs pour calculer
-                           automatiquement la 3ème.
-                        </DialogDescription>
-                     </DialogHeader>
-                     <AddCourseForm onSuccess={() => setIsDialogOpen(false)} />
-                  </DialogContent>
-               </Dialog>
-            </div>
-
-            {allCourses.length === 0 ? (
-               <div className="text-center py-12">
-                  <p className="text-lg text-muted-foreground">
-                     Aucune course enregistrée.
-                  </p>
+            <div className="">
+               <div className="mb-6">
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                     <DialogTrigger asChild>
+                        <Button className="bg-primary hover:bg-primary/90">
+                           <PlusIcon className="w-4 h-4 mr-2" />
+                           Ajouter une course
+                        </Button>
+                     </DialogTrigger>
+                     <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                           <DialogTitle>Ajouter une course</DialogTitle>
+                           <DialogDescription>
+                              Saisissez au moins 2 valeurs pour calculer
+                              automatiquement la 3ème.
+                           </DialogDescription>
+                        </DialogHeader>
+                        <AddCourseForm onSuccess={() => setIsDialogOpen(false)} />
+                     </DialogContent>
+                  </Dialog>
                </div>
-            ) : (
-               <div className="space-y-6">
-                  {allCourses.map((course) => (
-                     <Card
-                        key={course.id}
-                        className="py-2 gap-2 hover:shadow-lg transition-shadow"
-                     >
-                        <CardHeader className="px-4">
-                           <div className="flex justify-between items-center">
-                              <CardTitle className="text-lg">
-                                 {format(
-                                    new Date(course.date),
-                                    "EEEE d MMMM yyyy",
-                                    {
-                                       locale: fr,
-                                    }
-                                 )}
-                              </CardTitle>
-                           </div>
-                        </CardHeader>
-                        <CardContent className="px-4">
-                           <div className="flex justify-between items-center">
-                              <div className="grid grid-cols-3 gap-4 text-sm flex-1">
-                                 <div>
-                                    <span className="text-muted-foreground">
-                                       Durée:
-                                    </span>
-                                    <div
-                                       className={`font-semibold ${
-                                          isCalculatedValue(course, "duree")
-                                             ? "text-green-400"
-                                             : "text-white"
-                                       }`}
-                                    >
-                                       {(() => {
-                                          const calculatedValue =
-                                             getCalculatedValue(
-                                                course,
-                                                "duree"
-                                             );
-                                          const displayValue =
-                                             course.duree || calculatedValue;
 
-                                          return (
-                                             <>
-                                                {displayValue
-                                                   ? `${displayValue} min`
-                                                   : "Non renseigné"}
-                                                {isCalculatedValue(
+               {allCourses.length === 0 ? (
+                  <div className="text-center py-12">
+                     <p className="text-lg text-muted-foreground">
+                        Aucune course enregistrée.
+                     </p>
+                  </div>
+               ) : (
+                  <div className="space-y-6">
+                     {allCourses.map((course) => (
+                        <Card
+                           key={course.id}
+                           className="py-2 gap-2 hover:shadow-lg transition-shadow"
+                        >
+                           <CardHeader className="px-4">
+                              <div className="flex justify-between items-center">
+                                 <CardTitle className="text-lg">
+                                    {format(
+                                       new Date(course.date),
+                                       "EEEE d MMMM yyyy",
+                                       {
+                                          locale: fr,
+                                       }
+                                    )}
+                                 </CardTitle>
+                              </div>
+                           </CardHeader>
+                           <CardContent className="px-4">
+                              <div className="flex justify-between items-center">
+                                 <div className="grid grid-cols-3 gap-4 text-sm flex-1">
+                                    <div>
+                                       <span className="text-muted-foreground">
+                                          Durée:
+                                       </span>
+                                       <div
+                                          className={`font-semibold ${
+                                             isCalculatedValue(course, "duree")
+                                                ? "text-green-400"
+                                                : "text-white"
+                                          }`}
+                                       >
+                                          {(() => {
+                                             const calculatedValue =
+                                                getCalculatedValue(
                                                    course,
                                                    "duree"
-                                                ) && (
-                                                   <span className="text-xs text-green-400 block">
-                                                      (calculée)
-                                                   </span>
-                                                )}
-                                             </>
-                                          );
-                                       })()}
-                                    </div>
-                                 </div>
-                                 <div>
-                                    <span className="text-muted-foreground">
-                                       Distance:
-                                    </span>
-                                    <div
-                                       className={`font-semibold ${
-                                          isCalculatedValue(course, "distance")
-                                             ? "text-green-400"
-                                             : "text-white"
-                                       }`}
-                                    >
-                                       {(() => {
-                                          const calculatedValue =
-                                             getCalculatedValue(
-                                                course,
-                                                "distance"
-                                             );
-                                          const displayValue =
-                                             course.distance || calculatedValue;
+                                                );
+                                             const displayValue =
+                                                course.duree || calculatedValue;
 
-                                          return (
-                                             <>
-                                                {displayValue
-                                                   ? `${displayValue} km`
-                                                   : "Non renseigné"}
-                                                {isCalculatedValue(
+                                             return (
+                                                <>
+                                                   {displayValue
+                                                      ? `${displayValue} min`
+                                                      : "Non renseigné"}
+                                                   {isCalculatedValue(
+                                                      course,
+                                                      "duree"
+                                                   ) && (
+                                                      <span className="text-xs text-green-400 block">
+                                                         (calculée)
+                                                      </span>
+                                                   )}
+                                                </>
+                                             );
+                                          })()}
+                                       </div>
+                                    </div>
+                                    <div>
+                                       <span className="text-muted-foreground">
+                                          Distance:
+                                       </span>
+                                       <div
+                                          className={`font-semibold ${
+                                             isCalculatedValue(course, "distance")
+                                                ? "text-green-400"
+                                                : "text-white"
+                                          }`}
+                                       >
+                                          {(() => {
+                                             const calculatedValue =
+                                                getCalculatedValue(
                                                    course,
                                                    "distance"
-                                                ) && (
-                                                   <span className="text-xs text-green-400 block">
-                                                      (calculée)
-                                                   </span>
-                                                )}
-                                             </>
-                                          );
-                                       })()}
-                                    </div>
-                                 </div>
-                                 <div>
-                                    <span className="text-muted-foreground">
-                                       Vitesse:
-                                    </span>
-                                    <div
-                                       className={`font-semibold ${
-                                          isCalculatedValue(course, "vitesse")
-                                             ? "text-green-400"
-                                             : "text-white"
-                                       }`}
-                                    >
-                                       {(() => {
-                                          const calculatedValue =
-                                             getCalculatedValue(
-                                                course,
-                                                "vitesse"
-                                             );
-                                          const displayValue =
-                                             course.vitesse || calculatedValue;
+                                                );
+                                             const displayValue =
+                                                course.distance || calculatedValue;
 
-                                          return (
-                                             <>
-                                                {displayValue
-                                                   ? `${displayValue} km/h`
-                                                   : "Non renseigné"}
-                                                {isCalculatedValue(
+                                             return (
+                                                <>
+                                                   {displayValue
+                                                      ? `${displayValue} km`
+                                                      : "Non renseigné"}
+                                                   {isCalculatedValue(
+                                                      course,
+                                                      "distance"
+                                                   ) && (
+                                                      <span className="text-xs text-green-400 block">
+                                                         (calculée)
+                                                      </span>
+                                                   )}
+                                                </>
+                                             );
+                                          })()}
+                                       </div>
+                                    </div>
+                                    <div>
+                                       <span className="text-muted-foreground">
+                                          Vitesse:
+                                       </span>
+                                       <div
+                                          className={`font-semibold ${
+                                             isCalculatedValue(course, "vitesse")
+                                                ? "text-green-400"
+                                                : "text-white"
+                                          }`}
+                                       >
+                                          {(() => {
+                                             const calculatedValue =
+                                                getCalculatedValue(
                                                    course,
                                                    "vitesse"
-                                                ) && (
-                                                   <span className="text-xs text-green-400 block">
-                                                      (calculée)
-                                                   </span>
-                                                )}
-                                             </>
-                                          );
-                                       })()}
+                                                );
+                                             const displayValue =
+                                                course.vitesse || calculatedValue;
+
+                                             return (
+                                                <>
+                                                   {displayValue
+                                                      ? `${displayValue} km/h`
+                                                      : "Non renseigné"}
+                                                   {isCalculatedValue(
+                                                      course,
+                                                      "vitesse"
+                                                   ) && (
+                                                      <span className="text-xs text-green-400 block">
+                                                         (calculée)
+                                                      </span>
+                                                   )}
+                                                </>
+                                             );
+                                          })()}
+                                       </div>
                                     </div>
                                  </div>
+                                 <button
+                                    onClick={() => handleDelete(course.id)}
+                                    disabled={deletingId === course.id}
+                                    className="text-red-500 hover:text-red-700 transition-colors disabled:opacity-50 ml-4"
+                                    title="Supprimer cette course"
+                                 >
+                                    <Trash2Icon className="w-4 h-4" />
+                                 </button>
                               </div>
-                              <button
-                                 onClick={() => handleDelete(course.id)}
-                                 disabled={deletingId === course.id}
-                                 className="text-red-500 hover:text-red-700 transition-colors disabled:opacity-50 ml-4"
-                                 title="Supprimer cette course"
-                              >
-                                 <Trash2Icon className="w-4 h-4" />
-                              </button>
-                           </div>
-                        </CardContent>
-                     </Card>
-                  ))}
-               </div>
-            )}
+                           </CardContent>
+                        </Card>
+                     ))}
+                  </div>
+               )}
+            </div>
          </div>
-      </div>
+      </ProtectedRoute>
    );
 }

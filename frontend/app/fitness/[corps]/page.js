@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CorpsNavigation from "@/components/exercices/CorpsNavigation";
 import PageTitle from "@/components/PageTitle";
 import Link from "next/link";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function CorpsPage() {
    const { corps } = useParams();
@@ -24,46 +25,48 @@ export default function CorpsPage() {
    }
 
    return (
-      <div className="">
-         <PageTitle title={corps} className="capitalize" />
+      <ProtectedRoute>
+         <div className="">
+            <PageTitle title={corps} className="capitalize" />
 
-         <CorpsNavigation />
+            <CorpsNavigation />
 
-         {filteredTypes.length === 0 ? (
-            <div className="text-center py-12">
-               <p className="text-lg text-muted-foreground">
-                  Aucun exercice trouvé pour cette partie du corps.
-               </p>
-            </div>
-         ) : (
-            <div className="grid grid-cols-2 gap-2">
-               {filteredTypes.map((type) => (
-                  <Link key={type.id} href={`/fitness/${corps}/${type.id}`}>
-                     <Card className="h-full justify-between gap-2 py-2 hover:shadow-lg transition-shadow cursor-pointer">
-                        <CardHeader>
-                           <CardTitle className="text-center font-medium">
-                              {type.name}
-                           </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                           {type.image && (
-                              <div className="">
-                                 <Image
-                                    src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${type.image.formats.thumbnail.url}`}
-                                    alt={type.name}
-                                    width={75}
-                                    height={75}
-                                    // className="mx-auto filter brightness-0 invert"
-                                    className="mx-auto"
-                                 />
-                              </div>
-                           )}
-                        </CardContent>
-                     </Card>
-                  </Link>
-               ))}
-            </div>
-         )}
-      </div>
+            {filteredTypes.length === 0 ? (
+               <div className="text-center py-12">
+                  <p className="text-lg text-muted-foreground">
+                     Aucun exercice trouvé pour cette partie du corps.
+                  </p>
+               </div>
+            ) : (
+               <div className="grid grid-cols-2 gap-2">
+                  {filteredTypes.map((type) => (
+                     <Link key={type.id} href={`/fitness/${corps}/${type.id}`}>
+                        <Card className="h-full justify-between gap-2 py-2 hover:shadow-lg transition-shadow cursor-pointer">
+                           <CardHeader>
+                              <CardTitle className="text-center font-medium">
+                                 {type.name}
+                              </CardTitle>
+                           </CardHeader>
+                           <CardContent>
+                              {type.image && (
+                                 <div className="">
+                                    <Image
+                                       src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${type.image.formats.thumbnail.url}`}
+                                       alt={type.name}
+                                       width={75}
+                                       height={75}
+                                       // className="mx-auto filter brightness-0 invert"
+                                       className="mx-auto"
+                                    />
+                                 </div>
+                              )}
+                           </CardContent>
+                        </Card>
+                     </Link>
+                  ))}
+               </div>
+            )}
+         </div>
+      </ProtectedRoute>
    );
 }
