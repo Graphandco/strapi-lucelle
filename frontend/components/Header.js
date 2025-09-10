@@ -37,29 +37,26 @@ export default function Header() {
                   <div className="flex items-center gap-4">
                      {!loading && (
                         <>
-                           {
-                              user && (
-                                 <Link href="/dashboard">
-                                    <Avatar>
-                                       <AvatarImage src={avatarUrl} />
-                                       <AvatarFallback>
-                                          {user.user?.username
-                                             ?.charAt(0)
-                                             .toUpperCase()}
-                                       </AvatarFallback>
-                                    </Avatar>
-                                 </Link>
-                              )
-                              // : (
-                              //    <Button
-                              //       onClick={() => setIsLoginModalOpen(true)}
-                              //       variant="outline"
-                              //       className="text-white border-white hover:bg-white hover:text-gray-900"
-                              //    >
-                              //       Connexion
-                              //    </Button>
-                              // )
-                           }
+                           {user ? (
+                              <Link href="/dashboard">
+                                 <Avatar>
+                                    <AvatarImage src={avatarUrl} />
+                                    <AvatarFallback>
+                                       {user.user?.username
+                                          ?.charAt(0)
+                                          .toUpperCase()}
+                                    </AvatarFallback>
+                                 </Avatar>
+                              </Link>
+                           ) : (
+                              <Button
+                                 onClick={() => setIsLoginModalOpen(true)}
+                                 variant="outline"
+                                 className="text-white border-white hover:bg-white hover:text-gray-900"
+                              >
+                                 Connexion
+                              </Button>
+                           )}
                         </>
                      )}
                   </div>
