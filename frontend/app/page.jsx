@@ -37,7 +37,7 @@ export default function Homepage() {
                   />
                )}
                <div className="text-primary text-lg font-base">
-                  Bienvenue {user?.user?.username} !
+                  Bienvenue {user?.username} !
                </div>
                <div className="text-white text-sm">
                   {areProductsToBuy

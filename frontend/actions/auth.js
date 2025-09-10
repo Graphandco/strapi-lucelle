@@ -2,95 +2,82 @@
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
+// Fonction utilitaire pour les appels API
+async function strapiRequest(endpoint, options = {}) {
+   const url = `${STRAPI_URL}/api${endpoint}`;
+
+   const config = {
+      headers: {
+         "Content-Type": "application/json",
+         ...options.headers,
+      },
+      ...options,
+   };
+
+   try {
+      const response = await fetch(url, config);
+      const data = await response.json();
+
+      if (!response.ok) {
+         throw new Error(data.error?.message || "Une erreur est survenue");
+      }
+
+      return data;
+   } catch (error) {
+      console.error("Erreur API Strapi:", error);
+      throw error;
+   }
+}
+
+// Connexion
 export async function login(identifier, password) {
    try {
-      const res = await fetch(`${STRAPI_URL}/api/auth/local`, {
+      const data = await strapiRequest("/auth/local", {
          method: "POST",
-         headers: {
-            "Content-Type": "application/json",
-         },
          body: JSON.stringify({
-            identifier,
+            identifier, // email ou username
             password,
          }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-         throw new Error(data.error?.message || "Une erreur est survenue");
-      }
-
-      // Récupérer les données complètes de l'utilisateur avec les relations
-      const userRes = await fetch(`${STRAPI_URL}/api/users/me?populate=*`, {
-         headers: {
-            Authorization: `Bearer ${data.jwt}`,
-         },
-      });
-
-      if (!userRes.ok) {
-         throw new Error(
-            "Erreur lors de la récupération des données utilisateur"
-         );
-      }
-
-      const userData = await userRes.json();
-
-      // Combiner le JWT avec les données utilisateur complètes
       return {
+         success: true,
+         user: data.user,
          jwt: data.jwt,
-         user: userData,
       };
    } catch (error) {
-      throw new Error(error.message);
+      return {
+         success: false,
+         error: error.message,
+      };
    }
 }
 
-export async function register(username, email, password) {
+// Récupérer l'utilisateur actuel
+export async function getMe(jwt) {
    try {
-      const res = await fetch(`${STRAPI_URL}/api/auth/local/register`, {
-         method: "POST",
+      const data = await strapiRequest("/users/me", {
          headers: {
-            "Content-Type": "application/json",
-         },
-         body: JSON.stringify({
-            username,
-            email,
-            password,
-         }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-         throw new Error(data.error?.message || "Une erreur est survenue");
-      }
-
-      // Récupérer les données complètes de l'utilisateur avec les relations
-      const userRes = await fetch(`${STRAPI_URL}/api/users/me?populate=*`, {
-         headers: {
-            Authorization: `Bearer ${data.jwt}`,
+            Authorization: `Bearer ${jwt}`,
          },
       });
 
-      if (!userRes.ok) {
-         throw new Error(
-            "Erreur lors de la récupération des données utilisateur"
-         );
-      }
-
-      const userData = await userRes.json();
-
-      // Combiner le JWT avec les données utilisateur complètes
       return {
-         jwt: data.jwt,
-         user: userData,
+         success: true,
+         user: data,
       };
    } catch (error) {
-      throw new Error(error.message);
+      return {
+         success: false,
+         error: error.message,
+      };
    }
 }
 
+// Déconnexion (côté client uniquement)
 export async function logout() {
-   return { success: true };
+   return {
+      success: true,
+      message: "Déconnexion réussie",
+   };
 }

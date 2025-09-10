@@ -4,17 +4,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function ProtectedRoute({ children, redirectTo = "/login" }) {
-   const { user, loading } = useAuth();
+export default function ProtectedRoute({ children, redirectTo = "/" }) {
+   const { isAuthenticated, isLoading } = useAuth();
    const router = useRouter();
 
    useEffect(() => {
-      if (!loading && !user) {
+      if (!isLoading && !isAuthenticated) {
          router.push(redirectTo);
       }
-   }, [user, loading, router, redirectTo]);
+   }, [isAuthenticated, isLoading, router, redirectTo]);
 
-   if (loading) {
+   if (isLoading) {
       return (
          <div className="flex items-center justify-center min-h-screen">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -22,7 +22,7 @@ export default function ProtectedRoute({ children, redirectTo = "/login" }) {
       );
    }
 
-   if (!user) {
+   if (!isAuthenticated) {
       return null;
    }
 
