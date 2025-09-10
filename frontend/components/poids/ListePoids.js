@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export default function ListePoids({ allWeights }) {
    const { deleteWeight } = useWeights();
-   const { user } = useAuth();
+   const { user, jwt } = useAuth();
    const [deletingId, setDeletingId] = useState(null);
 
    const handleDelete = async (weightId) => {
@@ -16,7 +16,7 @@ export default function ListePoids({ allWeights }) {
       setDeletingId(weightId);
 
       try {
-         await deleteWeight(weightId, user.jwt);
+         await deleteWeight(weightId, jwt);
       } catch (error) {
          console.error("Erreur lors de la suppression:", error);
          alert("Erreur lors de la suppression de la mesure");

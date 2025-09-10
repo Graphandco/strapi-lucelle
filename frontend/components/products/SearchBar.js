@@ -8,7 +8,7 @@ import Image from "next/image";
 
 export default function SearchBar() {
    const { allProducts, updateProductToBuy } = useProducts();
-   const { user } = useAuth();
+   const { user, jwt } = useAuth();
    const [searchTerm, setSearchTerm] = useState("");
    const [filteredProducts, setFilteredProducts] = useState([]);
 
@@ -42,8 +42,8 @@ export default function SearchBar() {
    }, [searchTerm, allProducts]);
 
    const handleProductClick = async (product) => {
-      if (!user?.jwt) return;
-      await updateProductToBuy(product.documentId, product.isToBuy, user.jwt);
+      if (!jwt) return;
+      await updateProductToBuy(product.documentId, product.isToBuy, jwt);
       setSearchTerm("");
    };
 

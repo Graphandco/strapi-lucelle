@@ -9,12 +9,12 @@ export default function DashboardProducts() {
    const { allProducts, categories, deleteProduct } = useProducts();
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    const productsInCart = allProducts.filter((product) => product.isInCart);
-   const { user } = useAuth();
+   const { user, jwt } = useAuth();
 
    const handleDeleteProduct = async (productId) => {
-      if (!user?.jwt) return;
+      if (!jwt) return;
       try {
-         await deleteProduct(productId, user.jwt);
+         await deleteProduct(productId, jwt);
       } catch (error) {}
    };
 

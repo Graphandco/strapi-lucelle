@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MinusCircle, PlusCircle } from "lucide-react";
 
 const ProductCard = ({ product, pageType }) => {
-   const { user } = useAuth();
+   const { user, jwt } = useAuth();
    const { updateProductInCart, updateProductToBuy, updateProductQuantity } =
       useProducts();
    const productImage = product.image?.formats?.thumbnail?.url
@@ -18,9 +18,9 @@ const ProductCard = ({ product, pageType }) => {
       pageType === "inventaire" || pageType === "shopping-list";
 
    const handleQuantityChange = async (newQuantity) => {
-      if (!user?.jwt || newQuantity < 0) return;
+      if (!jwt || newQuantity < 0) return;
       try {
-         await updateProductQuantity(product.documentId, newQuantity, user.jwt);
+         await updateProductQuantity(product.documentId, newQuantity, jwt);
       } catch (error) {
          console.error("Erreur lors de la mise à jour de la quantité:", error);
       }
@@ -43,18 +43,18 @@ const ProductCard = ({ product, pageType }) => {
                isToBuy ? "!opacity-20 " : "opacity-100"
             }`}
             onClick={async () => {
-               if (!user?.jwt) return;
+               if (!jwt) return;
                if (pageType !== "inventaire") {
                   await updateProductInCart(
                      product.documentId,
                      product.isInCart,
-                     user.jwt
+                     jwt
                   );
                } else {
                   await updateProductToBuy(
                      product.documentId,
                      product.isToBuy,
-                     user.jwt
+                     jwt
                   );
                }
             }}
