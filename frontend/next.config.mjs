@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
    images: {
-      domains: ["localhost", "shopping-list-admin.graphandco.com"],
       remotePatterns: [
+         {
+            protocol: "http",
+            hostname: "localhost",
+         },
          {
             protocol: "https",
             hostname: "shopping-list-admin.graphandco.com",
