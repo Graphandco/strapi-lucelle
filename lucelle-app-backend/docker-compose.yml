@@ -1,0 +1,23 @@
+services:
+   app:
+      container_name: lucelle-app-backend
+      build:
+         context: .
+         dockerfile: Dockerfile
+      restart: unless-stopped
+      ports:
+         - "1335:1335"
+      env_file:
+         - .env
+      environment:
+         # Connexion au conteneur MySQL existant (mysql-main)
+         # Le hostname est le nom du conteneur MySQL
+         DATABASE_HOST: mysql-main
+         # Port interne du conteneur MySQL (3306, pas 3307 qui est le port exposé sur l'hôte)
+         DATABASE_PORT: 3306
+      networks:
+         - web-network
+
+networks:
+   web-network:
+      external: true

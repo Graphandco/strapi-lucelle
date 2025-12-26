@@ -1,0 +1,27 @@
+services:
+   app:
+      container_name: lucelle-app-backend-dev
+      build:
+         context: .
+         dockerfile: Dockerfile.dev
+      restart: unless-stopped
+      ports:
+         - "1335:1335"
+      env_file:
+         - .env.development
+      volumes:
+         - .:/app
+         - /app/node_modules
+         - /app/build
+         - /app/.strapi
+      environment:
+         NODE_ENV: development
+         PORT: 1335
+         HOST: 0.0.0.0
+         DATABASE_HOST: host.docker.internal
+      networks:
+         - web-network
+
+networks:
+   web-network:
+      external: true

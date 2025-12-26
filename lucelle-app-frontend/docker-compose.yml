@@ -1,0 +1,17 @@
+services:
+   app:
+      container_name: lucelle-app-frontend
+      build:
+         context: .
+         dockerfile: Dockerfile
+      restart: unless-stopped
+      ports:
+         - "3001:3001"  
+      env_file:
+         - .env
+      networks:
+         - web-network
+
+networks:
+   web-network:
+      external: true

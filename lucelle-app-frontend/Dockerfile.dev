@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY package*.json ./
+
+# Installer toutes les dépendances (y compris devDependencies)
+RUN npm install
+
+# Copier le reste du code (sera monté en volume en dev, mais utile si tu build l'image)
+COPY . .
+
+# Port Next.js dev
+EXPOSE 3001
+
+# Lancer Next en mode dev avec hot reload
+CMD ["npm", "run", "dev"]
