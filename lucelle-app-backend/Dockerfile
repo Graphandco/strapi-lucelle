@@ -14,8 +14,9 @@ WORKDIR /app
 # Copier uniquement les fichiers de dépendances d'abord (cache Docker)
 COPY package*.json ./
 # Installer toutes les dépendances (y compris devDependencies)
-# npm ci installe tout par défaut, pas besoin de --only
-RUN npm ci
+# Utiliser npm install au lieu de npm ci pour plus de flexibilité
+# npm install fonctionne avec ou sans package-lock.json
+RUN npm install
 
 # Copier le reste du code source
 COPY . .
