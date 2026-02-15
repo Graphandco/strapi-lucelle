@@ -5,8 +5,8 @@ services:
          context: .
          dockerfile: Dockerfile
       restart: unless-stopped
-      ports:
-         - "1335:1335"
+      # ports:
+      #    - "1335:1335"
       env_file:
          - .env
       environment:
