@@ -16,7 +16,7 @@ COPY package*.json ./
 # Installer toutes les dépendances (y compris devDependencies)
 # Utiliser npm install au lieu de npm ci pour plus de flexibilité
 # npm install fonctionne avec ou sans package-lock.json
-RUN npm install
+RUN npm ci
 
 # Copier le reste du code source
 COPY . .
