@@ -18,6 +18,27 @@ services:
       networks:
          - web-network
 
+      # Sécurité de base (Hardening)
+      cpus: 0.5
+      mem_limit: 512m
+      read_only: true
+      security_opt:
+         - no-new-privileges:true
+      tmpfs:
+         - /tmp:rw,noexec,nosuid,size=128m
+      volumes:
+         - strapi_uploads:/app/public/uploads
+
+      # Logs maîtrisés
+      logging:
+         driver: "json-file"
+         options:
+            max-size: "10m"
+            max-file: "3"
+
+volumes:
+   strapi_uploads:
+
 networks:
    web-network:
       external: true
