@@ -12,6 +12,7 @@ export async function getSupabaseProducts() {
          name,
          category_id,
          category:categories (
+            id,
             name
          )
       `,
@@ -20,6 +21,21 @@ export async function getSupabaseProducts() {
 
    if (error) {
       console.error("Error reading products:", error.message);
+      throw new Error(error.message);
+   }
+
+   return data ?? [];
+}
+
+export async function getSupabaseCategories() {
+   const { data, error } = await supabase
+      .schema("shopping_list")
+      .from("categories")
+      .select("id, name")
+      .order("name", { ascending: true });
+
+   if (error) {
+      console.error("Error reading categories:", error.message);
       throw new Error(error.message);
    }
 

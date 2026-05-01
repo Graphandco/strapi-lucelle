@@ -1,9 +1,8 @@
 "use client";
 import Image from "next/image";
 
-import { useProducts } from "@/contexts/ProductContext";
+import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
-import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import SearchBar from "@/components/products/SearchBar";
 import {
@@ -14,26 +13,17 @@ import {
 } from "@/components/ui/accordion";
 import { Recycle } from "lucide-react";
 import ConfirmAlert from "@/components/ConfirmAlert";
+import { clearAllShopping } from "@/actions/status";
 
 export default function ShoppingList() {
-   const {
-      allProducts,
-      categories,
-      updateProductToBuy,
-      updateProductInCart,
-      updateProductQuantity,
-      loading,
-   } = useProducts();
-   const { user } = useAuth();
+   const { products: allProducts, categories, loading, reload, updateProductQuantity } =
+      useCatalogData();
    const [isClearing, setIsClearing] = useState(false);
 
-   // Filtrer les produits qui sont à acheter
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
-   // Filtrer les produits non dans le panier
    const productsNotInCart = productsToBuy.filter(
-      (product) => !product.isInCart
+      (product) => !product.isInCart,
    );
-   // Filtrer les produits dans le panier
    const productsInCart = productsToBuy.filter((product) => product.isInCart);
 
    const handleClearCart = async () => {
@@ -41,31 +31,10 @@ export default function ShoppingList() {
 
       setIsClearing(true);
       try {
-         // Mettre à jour chaque produit du panier de manière séquentielle
-         for (const product of productsInCart) {
-            try {
-               // Réinitialiser la quantité à 1
-               await updateProductQuantity(product.documentId, 1);
-               // Mettre à jour le statut isToBuy
-               await updateProductToBuy(
-                  product.documentId,
-                  product.isToBuy
-               );
-               // Mettre à jour le statut isInCart
-               await updateProductInCart(
-                  product.documentId,
-                  product.isInCart
-               );
-            } catch (error) {
-               console.error(
-                  `Erreur lors de la mise à jour du produit ${product.name}:`,
-                  error
-               );
-               // Continue avec le prochain produit même si celui-ci échoue
-            }
-         }
+         await clearAllShopping();
+         await reload();
       } catch (error) {
-         console.error("Erreur lors du vidage du panier:", error);
+         console.error("Erreur lors du vidage de la liste:", error);
       } finally {
          setIsClearing(false);
       }
@@ -87,7 +56,7 @@ export default function ShoppingList() {
                ({productsNotInCart.length})
             </span>
          </h1>
-         <SearchBar />
+         <SearchBar allProducts={allProducts} onReload={reload} />
          {productsToBuy.length === 0 ? (
             <>
                <p className="text-center text-white">
@@ -104,12 +73,11 @@ export default function ShoppingList() {
             </>
          ) : (
             <div className="grid gap-8">
-               {/* Liste des produits non dans le panier, triés par catégorie */}
                {productsNotInCart.length > 0 && (
                   <div className="bg-card rounded-lg px-3 pb-1">
                      {categories.map((category) => {
                         const productsInCategory = productsNotInCart.filter(
-                           (product) => product.category?.id === category.id
+                           (product) => product.category?.id === category.id,
                         );
 
                         if (productsInCategory.length === 0) return null;
@@ -125,6 +93,10 @@ export default function ShoppingList() {
                                        key={product.documentId}
                                        product={product}
                                        pageType="shopping-list"
+                                       onReload={reload}
+                                       updateProductQuantity={
+                                          updateProductQuantity
+                                       }
                                     />
                                  ))}
                               </ul>
@@ -134,7 +106,6 @@ export default function ShoppingList() {
                   </div>
                )}
 
-               {/* Liste des produits dans le panier */}
                {productsInCart.length > 0 && (
                   <div>
                      <Accordion type="single" collapsible>
@@ -150,16 +121,19 @@ export default function ShoppingList() {
                                           key={product.documentId}
                                           product={product}
                                           pageType="shopping-list"
+                                          onReload={reload}
+                                          updateProductQuantity={
+                                             updateProductQuantity
+                                          }
                                        />
                                     ))}
                                  </ul>
 
                                  <ConfirmAlert
-                                    title="Vider tout le panier?"
-                                    description="Les produits seront remis dans
-                                               l'inventaire."
+                                    title="Vider la liste de courses ?"
+                                    description="Le panier sera vidé. Les articles qui y étaient seront retirés de « à acheter » ; le reste de la liste à acheter est conservé."
                                     action={handleClearCart}
-                                    notif="Le panier a été vidé !"
+                                    notif="La liste à acheter a été vidée !"
                                     confirmText="Vider"
                                  >
                                     <div className="mt-4">

@@ -2,7 +2,6 @@ import { Inter, Jost } from "next/font/google";
 
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ProductProvider } from "@/contexts/ProductContext";
 import { WeightProvider } from "@/contexts/WeightContext";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -35,18 +34,16 @@ export default function RootLayout({ children }) {
             className={`${jost.variable} flex flex-col justify-between pb-16`}
          >
             <AuthProvider>
-               <ProductProvider>
-                  <WeightProvider>
-                     <ExerciceProvider>
-                        <Header />
-                        <main className="grow container flex flex-col justify-between pt-6">
-                           {children}
-                        </main>
-                        <Footer />
-                        <Toaster position="top-center" />
-                     </ExerciceProvider>
-                  </WeightProvider>
-               </ProductProvider>
+               <WeightProvider>
+                  <ExerciceProvider>
+                     <Header />
+                     <main className="grow container flex flex-col justify-between pt-6">
+                        {children}
+                     </main>
+                     <Footer />
+                     <Toaster position="top-center" />
+                  </ExerciceProvider>
+               </WeightProvider>
             </AuthProvider>
          </body>
       </html>

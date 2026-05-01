@@ -1,12 +1,13 @@
 "use client";
 
-import { useProducts } from "@/contexts/ProductContext";
+import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
 import Link from "next/link";
-import { Plus, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 
 export default function Inventaire() {
-   const { allProducts, categories, loading } = useProducts();
+   const { products: allProducts, categories, loading, reload, updateProductQuantity } =
+      useCatalogData();
 
    if (loading) {
       return <div>Chargement...</div>;
@@ -30,7 +31,7 @@ export default function Inventaire() {
          </div>
          {categories.map((category) => {
             const productsInCategory = allProducts.filter(
-               (product) => product.category?.id === category.id
+               (product) => product.category?.id === category.id,
             );
 
             if (productsInCategory.length === 0) return null;
@@ -46,6 +47,8 @@ export default function Inventaire() {
                            key={product.documentId}
                            product={product}
                            pageType="inventaire"
+                           onReload={reload}
+                           updateProductQuantity={updateProductQuantity}
                         />
                      ))}
                   </ul>

@@ -1,25 +1,20 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { useProducts } from "@/contexts/ProductContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { addToBuy } from "@/actions/status";
 
-export default function SearchBar() {
-   const { allProducts, updateProductToBuy } = useProducts();
-   const { user } = useAuth();
+export default function SearchBar({ allProducts, onReload }) {
    const [searchTerm, setSearchTerm] = useState("");
    const [filteredProducts, setFilteredProducts] = useState([]);
 
-   // Fonction pour normaliser le texte (retirer accents, caractères spéciaux, etc.)
    const normalizeText = (text) => {
       return text
          .toLowerCase()
          .normalize("NFD")
-         .replace(/[\u0300-\u036f]/g, "") // Retire les accents
-         .replace(/[^a-z0-9\s]/g, "") // Garde seulement lettres, chiffres et espaces
-         .replace(/\s+/g, " ") // Remplace les espaces multiples par un seul
+         .replace(/[\u0300-\u036f]/g, "")
+         .replace(/[^a-z0-9\s]/g, "")
+         .replace(/\s+/g, " ")
          .trim();
    };
 
@@ -37,13 +32,18 @@ export default function SearchBar() {
             const normalizedProductName = normalizeText(product.name);
             return normalizedProductName.includes(normalizedSearchTerm);
          })
-         .slice(0, 99); // Limite à 5 produits
+         .slice(0, 99);
       setFilteredProducts(filtered);
    }, [searchTerm, allProducts]);
 
    const handleProductClick = async (product) => {
-      await updateProductToBuy(product.documentId, product.isToBuy);
-      setSearchTerm("");
+      try {
+         await addToBuy(product.documentId);
+         setSearchTerm("");
+         await onReload?.();
+      } catch (error) {
+         console.error("Erreur ajout à acheter:", error);
+      }
    };
 
    return (

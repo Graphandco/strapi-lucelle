@@ -1,21 +1,31 @@
 "use client";
-import { useAuth } from "@/contexts/AuthContext";
-import { useProducts } from "@/contexts/ProductContext";
+import { useCatalogData } from "@/hooks/useCatalogData";
 import { Trash } from "lucide-react";
 import ConfirmAlert from "@/components/ConfirmAlert";
 import DashboardSummary from "./DashboardSummary";
+import { deleteProduct } from "@/actions/deleteProduct";
 
 export default function DashboardProducts() {
-   const { allProducts, categories, deleteProduct } = useProducts();
+   const { products: allProducts, categories, loading, reload } =
+      useCatalogData();
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    const productsInCart = allProducts.filter((product) => product.isInCart);
-   const { user } = useAuth();
 
    const handleDeleteProduct = async (productId) => {
       try {
-         await deleteProduct(productId);
-      } catch (error) {}
+         const response = await deleteProduct(productId);
+         if (!response?.success) {
+            throw new Error(response?.error || "Échec de la suppression");
+         }
+         await reload();
+      } catch (error) {
+         console.error(error);
+      }
    };
+
+   if (loading) {
+      return <div className="text-white">Chargement...</div>;
+   }
 
    return (
       <>
@@ -27,7 +37,7 @@ export default function DashboardProducts() {
          <div className="bg-card rounded-lg mt-10 p-3 w-full space-y-3">
             {categories.map((category) => {
                const productsInCategory = allProducts.filter(
-                  (product) => product.category?.id === category.id
+                  (product) => product.category?.id === category.id,
                );
 
                if (productsInCategory.length === 0) return null;

@@ -1,17 +1,34 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
-import { useProducts } from "@/contexts/ProductContext";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addProduct } from "@/actions/addProduct";
+import { getSupabaseCategories } from "@/actions/getSupabaseProduct";
 
 export default function AddProductForm() {
-   const { user } = useAuth();
-   const { refreshProducts, categories } = useProducts();
    const router = useRouter();
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
+   const [categories, setCategories] = useState([]);
+
+   useEffect(() => {
+      let cancelled = false;
+      (async () => {
+         try {
+            const data = await getSupabaseCategories();
+            if (!cancelled) {
+               setCategories(
+                  [...(data ?? [])].map((c) => ({ ...c, id: String(c.id) })),
+               );
+            }
+         } catch (e) {
+            console.error(e);
+         }
+      })();
+      return () => {
+         cancelled = true;
+      };
+   }, []);
 
    async function handleSubmit(event) {
       event.preventDefault();
@@ -25,14 +42,10 @@ export default function AddProductForm() {
 
          if (!result.success) {
             throw new Error(
-               result.error || "Erreur lors de l'ajout du produit"
+               result.error || "Erreur lors de l'ajout du produit",
             );
          }
 
-         // Recharger tous les produits
-         await refreshProducts();
-
-         // Rediriger vers la liste de courses
          router.push("/shopping-list");
       } catch (error) {
          console.error("Erreur détaillée:", error);
@@ -76,44 +89,6 @@ export default function AddProductForm() {
                ))}
             </select>
          </div>
-
-         {/* <div>
-               <input
-                  type="number"
-                  id="quantity"
-                  name="quantity"
-                  min="0"
-                  step="1"
-                  defaultValue="1"
-                  required
-                  placeholder="Quantité"
-                  className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white placeholder:text-sm"
-               />
-            </div> */}
-
-         {/* <div className="flex items-center space-x-4">
-               <div className="flex items-center">
-                  <input
-                     type="checkbox"
-                     id="isInCart"
-                     name="isInCart"
-                     value="true"
-                     className="mr-2"
-                  />
-                  <label htmlFor="isInCart">Dans le panier</label>
-               </div>
-
-               <div className="flex items-center">
-                  <input
-                     type="checkbox"
-                     id="isToBuy"
-                     name="isToBuy"
-                     value="true"
-                     className="mr-2"
-                  />
-                  <label htmlFor="isToBuy">À acheter</label>
-               </div>
-            </div> */}
 
          {error && <div className="text-red-500 text-sm">{error}</div>}
 

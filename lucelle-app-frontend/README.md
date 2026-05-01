@@ -246,6 +246,52 @@ order by grantee, privilege_type;
 
 Tu dois voir **`authenticated`** avec au moins **SELECT**, **INSERT**, **DELETE**.
 
+### 2.7 Table `shopping_list.status` (à acheter / panier par utilisateur)
+
+Même principe que les favoris : **`GRANT`** pour **`authenticated`** + **RLS** sur `user_id = auth.uid()`.
+
+La table s’appelle **`status`** dans le schéma **`shopping_list`** (colonnes typiques : `user_id`, `product_id`, `is_to_buy`, `is_in_cart`). La FK **`user_id`** doit pointer vers **`auth.users(id)`**, pas vers `oauth_clients`.
+
+**Règle métier côté app :** une ligne n’existe que tant que le produit est « à acheter » ; retirer « à acheter » **supprime la ligne** (panier inclus). Le panier ne modifie que **`is_in_cart`** via **`setInCartOnly`** (pas de changement de **`is_to_buy`**). L’inventaire utilise **`toggleToBuyInventory`** (insert / delete de ligne). **`clearAllToBuyStatuses`** supprime toutes les lignes avec **`is_to_buy = true`**. Les réponses de **`getProductStatuses`** normalisent **`is_in_cart`** à faux si **`is_to_buy`** est faux.
+
+**Privilèges :** le rôle **`authenticated`** doit avoir **`UPDATE`** sur **`shopping_list.status`** (en plus de select / insert / delete) pour les mises à jour du panier.
+
+**Privilèges :**
+
+```sql
+grant usage on schema shopping_list to authenticated;
+
+grant select, insert, update, delete on table shopping_list.status to authenticated;
+```
+
+**RLS :**
+
+```sql
+alter table shopping_list.status enable row level security;
+
+drop policy if exists "status_select_own" on shopping_list.status;
+drop policy if exists "status_insert_own" on shopping_list.status;
+drop policy if exists "status_update_own" on shopping_list.status;
+drop policy if exists "status_delete_own" on shopping_list.status;
+
+create policy "status_select_own"
+  on shopping_list.status for select to authenticated
+  using (user_id = auth.uid());
+
+create policy "status_insert_own"
+  on shopping_list.status for insert to authenticated
+  with check (user_id = auth.uid());
+
+create policy "status_update_own"
+  on shopping_list.status for update to authenticated
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+create policy "status_delete_own"
+  on shopping_list.status for delete to authenticated
+  using (user_id = auth.uid());
+```
+
 ---
 
 ## 3. Nouvelles tables dans le schéma
@@ -294,3 +340,4 @@ npm run dev
 - Client Supabase : `supabase-client.js`
 - Exemple server action + schéma custom : `actions/getSupabaseProduct.js`
 - Favoris (session utilisateur + cookies) : `actions/favorites.js`
+- Statuts produit (`is_to_buy` / `is_in_cart`) : `actions/status.js`

@@ -1,57 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useProducts } from "@/contexts/ProductContext";
-import { getSupabaseProducts } from "@/actions/getSupabaseProduct";
-import { getFavoriteProductIds } from "@/actions/favorites";
+import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
-import SupabaseProductRow from "@/components/products/SupabaseProductRow";
 import Image from "next/image";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function Homepage() {
    const { user } = useAuth();
-   const { allProducts, loading } = useProducts();
-   const [supabaseProducts, setSupabaseProducts] = useState([]);
-   const [supabaseError, setSupabaseError] = useState(null);
-   const [favoriteIdSet, setFavoriteIdSet] = useState(() => new Set());
+   const { products: allProducts, loading, reload } = useCatalogData();
 
-   useEffect(() => {
-      let cancelled = false;
-      Promise.all([getSupabaseProducts(), getFavoriteProductIds()])
-         .then(([rows, favoriteIds]) => {
-            if (cancelled) return;
-            setSupabaseProducts(rows);
-            setFavoriteIdSet(
-               new Set(favoriteIds.map((id) => (id == null ? "" : String(id)))),
-            );
-         })
-         .catch((err) => {
-            if (!cancelled) setSupabaseError(err.message ?? "Erreur Supabase");
-         });
-      return () => {
-         cancelled = true;
-      };
-   }, [user?.id]);
-
-   // Filtrer les produits qui sont à acheter
-   const productsToBuy = allProducts.filter((product) => product.isToBuy);
-   // Filtrer les produits qui ne sont pas dans le panier
-   const productsNotInCart = productsToBuy.filter(
-      (product) => !product.isInCart,
+   /** À acheter mais pas encore marqués « dans le panier » (rappel avant / pendant les courses). */
+   const productsToBuyNotInCart = allProducts.filter(
+      (product) => product.isToBuy && !product.isInCart,
    );
 
    if (loading) {
       return <div>Chargement...</div>;
    }
-   const areProductsToBuy = productsNotInCart.length > 0;
+
+   const hasItems = productsToBuyNotInCart.length > 0;
 
    return (
       <ProtectedRoute>
          <div className="">
             <div className="py-3 space-y-1 text-center">
-               {areProductsToBuy && (
+               {hasItems && (
                   <Image
                      src="/full-cart.png"
                      alt="Caddie plein"
@@ -65,18 +39,19 @@ export default function Homepage() {
                   Bienvenue {user?.username} !
                </div>
                <div className="text-white text-sm">
-                  {areProductsToBuy
-                     ? `Voici la liste des ${productsNotInCart.length} produits à acheter`
-                     : "Aucun produit à acheter"}
+                  {hasItems
+                     ? `Encore à prendre / mettre au panier (${productsToBuyNotInCart.length}) — touchez quand c’est fait`
+                     : "Tout est au panier ou rien à acheter pour l’instant"}
                </div>
             </div>
-            {areProductsToBuy ? (
+            {hasItems ? (
                <ul className="bg-card rounded-lg px-3 pb-1 mt-5">
-                  {productsNotInCart.map((product) => (
+                  {productsToBuyNotInCart.map((product) => (
                      <ProductCard
                         key={product.documentId}
                         product={product}
                         pageType="homepage"
+                        onReload={reload}
                      />
                   ))}
                </ul>
@@ -90,26 +65,6 @@ export default function Homepage() {
                   priority
                />
             )}
-            <div className="mt-8 px-3 text-left">
-               <p className="text-primary text-sm font-medium mb-2">
-                  Produits (Supabase)
-               </p>
-               {supabaseError ? (
-                  <p className="text-destructive text-sm">{supabaseError}</p>
-               ) : (
-                  <ul className="rounded-lg border border-white/10 bg-card px-3">
-                     {supabaseProducts.map((row, i) => (
-                        <SupabaseProductRow
-                           key={row.id ?? `${row.name}-${i}`}
-                           product={row}
-                           initialFavorite={favoriteIdSet.has(
-                              row.id == null ? "" : String(row.id),
-                           )}
-                        />
-                     ))}
-                  </ul>
-               )}
-            </div>
          </div>
       </ProtectedRoute>
    );

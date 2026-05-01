@@ -1,15 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useAuth } from "@/contexts/AuthContext";
-import { useProducts } from "@/contexts/ProductContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { MinusCircle, PlusCircle } from "lucide-react";
+import { addToBuy, removeToBuy, addInCart, removeInCart } from "@/actions/status";
 
-const ProductCard = ({ product, pageType }) => {
-   const { user } = useAuth();
-   const { updateProductInCart, updateProductToBuy, updateProductQuantity } =
-      useProducts();
+const ProductCard = ({
+   product,
+   pageType,
+   onReload,
+   updateProductQuantity,
+}) => {
    const rawThumbnail = product.image?.formats?.thumbnail?.url;
    const productImage = rawThumbnail
       ? rawThumbnail.startsWith("http://") ||
@@ -24,7 +25,7 @@ const ProductCard = ({ product, pageType }) => {
    const handleQuantityChange = async (newQuantity) => {
       if (newQuantity < 0) return;
       try {
-         await updateProductQuantity(product.documentId, newQuantity);
+         updateProductQuantity?.(product.documentId, newQuantity);
       } catch (error) {
          console.error("Erreur lors de la mise à jour de la quantité:", error);
       }
@@ -47,13 +48,27 @@ const ProductCard = ({ product, pageType }) => {
                isToBuy ? "opacity-20! " : "opacity-100"
             }`}
             onClick={async () => {
-               if (pageType !== "inventaire") {
-                  await updateProductInCart(
-                     product.documentId,
-                     product.isInCart,
-                  );
-               } else {
-                  await updateProductToBuy(product.documentId, product.isToBuy);
+               try {
+                  if (pageType === "inventaire") {
+                     if (product.isToBuy) {
+                        await removeToBuy(product.documentId);
+                     } else {
+                        await addToBuy(product.documentId);
+                     }
+                  } else if (pageType === "homepage") {
+                     if (!product.isInCart) {
+                        await addInCart(product.documentId);
+                     }
+                  } else if (pageType === "shopping-list") {
+                     if (product.isInCart) {
+                        await removeInCart(product.documentId);
+                     } else {
+                        await addInCart(product.documentId);
+                     }
+                  }
+                  await onReload?.();
+               } catch (error) {
+                  console.error("Erreur statut produit:", error);
                }
             }}
          >
@@ -69,9 +84,10 @@ const ProductCard = ({ product, pageType }) => {
             {showQuantity && (
                <div
                   className="flex items-center"
-                  onClick={(e) => e.stopPropagation()} // Empêche le clic de se propager au li
+                  onClick={(e) => e.stopPropagation()}
                >
                   <button
+                     type="button"
                      onClick={() => handleQuantityChange(product.quantity - 1)}
                      className=" p-1 rounded-full hover:bg-primary/10 transition-colors"
                      disabled={product.quantity <= 1}
@@ -82,6 +98,7 @@ const ProductCard = ({ product, pageType }) => {
                      {product.quantity}
                   </span>
                   <button
+                     type="button"
                      onClick={() => handleQuantityChange(product.quantity + 1)}
                      className=" p-1 rounded-full hover:bg-primary/10 transition-colors"
                   >
