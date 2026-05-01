@@ -85,7 +85,6 @@ export function AuthProvider({ children }) {
       checkAuth();
    }, []);
 
-   // Fonction de connexion
    const login = (user) => {
       dispatch({
          type: AUTH_ACTIONS.LOGIN_SUCCESS,

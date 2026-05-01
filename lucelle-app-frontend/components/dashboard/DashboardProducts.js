@@ -1,26 +1,42 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useCatalogData } from "@/hooks/useCatalogData";
 import { Trash } from "lucide-react";
 import ConfirmAlert from "@/components/ConfirmAlert";
 import DashboardSummary from "./DashboardSummary";
 import { deleteProduct } from "@/actions/deleteProduct";
+import { getMyProfileRole } from "@/actions/getMyProfileRole";
 
 export default function DashboardProducts() {
-   const { products: allProducts, categories, loading, reload } =
-      useCatalogData();
+   const [isAdmin, setIsAdmin] = useState(false);
+
+   useEffect(() => {
+      let cancelled = false;
+      getMyProfileRole().then(({ role }) => {
+         if (!cancelled) setIsAdmin(role === "admin");
+      });
+      return () => {
+         cancelled = true;
+      };
+   }, []);
+
+   const {
+      products: allProducts,
+      categories,
+      loading,
+      reload,
+   } = useCatalogData();
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    const productsInCart = allProducts.filter((product) => product.isInCart);
 
    const handleDeleteProduct = async (productId) => {
-      try {
-         const response = await deleteProduct(productId);
-         if (!response?.success) {
-            throw new Error(response?.error || "Échec de la suppression");
-         }
-         await reload({ silent: true });
-      } catch (error) {
-         console.error(error);
+      const response = await deleteProduct(productId);
+      if (!response?.success) {
+         throw new Error(
+            response?.error || "Échec de la suppression du produit",
+         );
       }
+      await reload({ silent: true });
    };
 
    if (loading) {
@@ -60,19 +76,21 @@ export default function DashboardProducts() {
                                  {product.name}
                               </p>
 
-                              <ConfirmAlert
-                                 title={`Supprimer le produit ${product.name} ?`}
-                                 description="Cette action est irréversible."
-                                 action={() =>
-                                    handleDeleteProduct(product.documentId)
-                                 }
-                                 notif={`${product.name} a bien été supprimé`}
-                              >
-                                 <Trash
-                                    size={15}
-                                    className="text-red-400 cursor-pointer hover:text-red-300 transition-colors"
-                                 />
-                              </ConfirmAlert>
+                              {isAdmin && (
+                                 <ConfirmAlert
+                                    title={`Supprimer le produit ${product.name} ?`}
+                                    description="Cette action est irréversible."
+                                    action={() =>
+                                       handleDeleteProduct(product.documentId)
+                                    }
+                                    notif={`${product.name} a bien été supprimé`}
+                                 >
+                                    <Trash
+                                       size={15}
+                                       className="text-red-400 cursor-pointer hover:text-red-300 transition-colors"
+                                    />
+                                 </ConfirmAlert>
+                              )}
                            </div>
                         ))}
                      </ul>

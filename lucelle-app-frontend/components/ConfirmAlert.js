@@ -29,7 +29,11 @@ export default function ConfirmAlert({
          }
       } catch (error) {
          console.error("Erreur lors de l'action:", error);
-         toast.error("Une erreur est survenue");
+         const msg =
+            error instanceof Error && error.message
+               ? error.message
+               : "Une erreur est survenue";
+         toast.error(msg);
       }
    };
 
