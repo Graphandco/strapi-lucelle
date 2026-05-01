@@ -2,35 +2,66 @@
 
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { MinusCircle, PlusCircle } from "lucide-react";
-import { addToBuy, removeToBuy, addInCart, removeInCart } from "@/actions/status";
+import { MinusCircle, PlusCircle, Heart } from "lucide-react";
+import {
+   addToBuy,
+   removeToBuy,
+   addInCart,
+   removeInCart,
+   updateToBuyQuantity,
+} from "@/actions/status";
+import { setFavorite } from "@/actions/favorites";
 
 const ProductCard = ({
    product,
    pageType,
    patchProduct,
    reconcile,
-   updateProductQuantity,
 }) => {
    const rawThumbnail = product.image?.formats?.thumbnail?.url;
-   const productImage = rawThumbnail
+   const strapiOrRelative = rawThumbnail
       ? rawThumbnail.startsWith("http://") ||
         rawThumbnail.startsWith("https://")
          ? rawThumbnail
          : `${process.env.NEXT_PUBLIC_STRAPI_URL}${rawThumbnail}`
       : null;
+   const productImage =
+      product.imageUrl &&
+      (product.imageUrl.startsWith("http://") ||
+         product.imageUrl.startsWith("https://"))
+         ? product.imageUrl
+         : strapiOrRelative;
    const isToBuy = pageType === "inventaire" && product.isToBuy;
-   const showQuantity =
-      pageType === "inventaire" || pageType === "shopping-list";
+   const showQuantity = pageType === "shopping-list";
 
    const handleQuantityChange = async (newQuantity) => {
-      if (newQuantity < 0) return;
+      const q = Math.floor(Number(newQuantity));
+      if (!Number.isFinite(q) || q < 1 || !product.isToBuy) return;
       try {
-         updateProductQuantity?.(product.documentId, newQuantity);
+         patchProduct?.(product.documentId, { quantity: q });
+         await updateToBuyQuantity(product.documentId, q);
       } catch (error) {
          console.error("Erreur lors de la mise à jour de la quantité:", error);
+         await reconcile?.();
       }
    };
+
+   const handleFavoriteClick = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const prev = !!product.isFavorited;
+      patchProduct?.(product.documentId, { isFavorited: !prev });
+      try {
+         const r = await setFavorite(product.documentId);
+         patchProduct?.(product.documentId, { isFavorited: r.favorited });
+      } catch (error) {
+         console.error("Erreur favori:", error);
+         patchProduct?.(product.documentId, { isFavorited: prev });
+         await reconcile?.();
+      }
+   };
+
+   const qty = Math.max(1, Number(product.quantity) || 1);
 
    return (
       <AnimatePresence mode="wait">
@@ -52,10 +83,17 @@ const ProductCard = ({
                try {
                   if (pageType === "inventaire") {
                      const nextToBuy = !product.isToBuy;
-                     patchProduct?.(product.documentId, { isToBuy: nextToBuy });
                      if (nextToBuy) {
+                        patchProduct?.(product.documentId, {
+                           isToBuy: true,
+                           quantity: 1,
+                        });
                         await addToBuy(product.documentId);
                      } else {
+                        patchProduct?.(product.documentId, {
+                           isToBuy: false,
+                           quantity: product.catalogBaseQuantity ?? 1,
+                        });
                         await removeToBuy(product.documentId);
                      }
                   } else if (pageType === "homepage") {
@@ -87,25 +125,61 @@ const ProductCard = ({
                />
                <span className="text-white text-sm">{product.name}</span>
             </div>
-            {showQuantity && (
+            {pageType === "inventaire" && (
                <div
-                  className="flex items-center"
+                  className="flex items-center relative z-10"
                   onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
                >
                   <button
                      type="button"
-                     onClick={() => handleQuantityChange(product.quantity - 1)}
+                     onClick={handleFavoriteClick}
+                     className="p-1.5 rounded-full hover:bg-primary/10 transition-colors"
+                     aria-label={
+                        product.isFavorited
+                           ? "Retirer des favoris"
+                           : "Ajouter aux favoris"
+                     }
+                  >
+                     <Heart
+                        size={20}
+                        className={
+                           product.isFavorited
+                              ? "text-primary fill-primary"
+                              : "text-primary/45"
+                        }
+                     />
+                  </button>
+               </div>
+            )}
+            {showQuantity && (
+               <div
+                  className="flex items-center relative z-10"
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+               >
+                  <button
+                     type="button"
+                     onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleQuantityChange(qty - 1);
+                     }}
                      className=" p-1 rounded-full hover:bg-primary/10 transition-colors"
-                     disabled={product.quantity <= 1}
+                     disabled={qty <= 1}
                   >
                      <MinusCircle size={16} className="text-primary/50" />
                   </button>
                   <span className="text-white min-w-[20px] text-center">
-                     {product.quantity}
+                     {qty}
                   </span>
                   <button
                      type="button"
-                     onClick={() => handleQuantityChange(product.quantity + 1)}
+                     onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleQuantityChange(qty + 1);
+                     }}
                      className=" p-1 rounded-full hover:bg-primary/10 transition-colors"
                   >
                      <PlusCircle size={16} className="text-primary/50" />

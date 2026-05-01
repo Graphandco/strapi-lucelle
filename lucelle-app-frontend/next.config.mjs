@@ -1,4 +1,21 @@
 /** @type {import('next').NextConfig} */
+const supabasePatterns = (() => {
+   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+   if (!url) return [];
+   try {
+      const { protocol, hostname } = new URL(url);
+      return [
+         {
+            protocol: protocol.replace(":", ""),
+            hostname,
+            pathname: "/storage/v1/object/public/**",
+         },
+      ];
+   } catch {
+      return [];
+   }
+})();
+
 const nextConfig = {
    images: {
       remotePatterns: [
@@ -16,6 +33,7 @@ const nextConfig = {
             hostname: "payload.graphandco.com",
             // pathname: "/api/media/file/**",
          },
+         ...supabasePatterns,
       ],
    },
 };

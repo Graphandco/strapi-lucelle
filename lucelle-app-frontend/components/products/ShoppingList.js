@@ -23,7 +23,6 @@ export default function ShoppingList() {
       reload,
       patchProduct,
       optimisticClearShopping,
-      updateProductQuantity,
    } = useCatalogData();
    const [isClearing, setIsClearing] = useState(false);
 
@@ -109,9 +108,6 @@ export default function ShoppingList() {
                                        pageType="shopping-list"
                                        patchProduct={patchProduct}
                                        reconcile={reconcile}
-                                       updateProductQuantity={
-                                          updateProductQuantity
-                                       }
                                     />
                                  ))}
                               </ul>
@@ -138,9 +134,6 @@ export default function ShoppingList() {
                                           pageType="shopping-list"
                                           patchProduct={patchProduct}
                                           reconcile={reconcile}
-                                          updateProductQuantity={
-                                             updateProductQuantity
-                                          }
                                        />
                                     ))}
                                  </ul>

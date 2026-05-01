@@ -7,15 +7,16 @@ import {
    getSupabaseCategories,
 } from "@/actions/getSupabaseProduct";
 import {
-   listToBuyProductIds,
+   listToBuyStatus,
    listInCartProductIds,
 } from "@/actions/status";
+import { getFavoriteProductIds } from "@/actions/favorites";
 
 function pidKey(id) {
    return id == null ? "" : String(id);
 }
 
-function mapRow(row, toBuyIds, inCartIds) {
+function mapRow(row, toBuyQuantityByProductId, inCartIds, favoriteIds) {
    const id = row.id;
    const key = pidKey(id);
    const category = row.category
@@ -27,15 +28,24 @@ function mapRow(row, toBuyIds, inCartIds) {
         ? { id: String(row.category_id), name: "—" }
         : null;
 
+   const isToBuy = toBuyQuantityByProductId.has(key);
+   const quantity = isToBuy
+      ? Math.max(1, Number(toBuyQuantityByProductId.get(key)) || 1)
+      : Math.max(1, Number(row.quantity) || 1);
+
    return {
       id,
       documentId: key,
       name: row.name,
-      isToBuy: toBuyIds.has(key),
+      isToBuy,
       isInCart: inCartIds.has(key),
       category,
-      quantity: row.quantity ?? 1,
+      quantity,
+      /** Quantité catalogue (table `products`), utile quand `isToBuy` est faux. */
+      catalogBaseQuantity: Math.max(1, Number(row.quantity) || 1),
+      imageUrl: row.image_url ?? null,
       image: null,
+      isFavorited: favoriteIds.has(key),
    };
 }
 
@@ -54,16 +64,33 @@ export function useCatalogData() {
          setLoading(true);
       }
       try {
-         const [rows, cats, toBuyRaw, inCartRaw] = await Promise.all([
-            getSupabaseProducts(),
-            getSupabaseCategories(),
-            listToBuyProductIds(),
-            listInCartProductIds(),
-         ]);
-         const toBuyIds = new Set(toBuyRaw.map((x) => String(x)));
+         const [rows, cats, toBuyRows, inCartRaw, favoriteRaw] =
+            await Promise.all([
+               getSupabaseProducts(),
+               getSupabaseCategories(),
+               listToBuyStatus(),
+               listInCartProductIds(),
+               getFavoriteProductIds(),
+            ]);
+         const toBuyQuantityByProductId = new Map(
+            (toBuyRows ?? []).map((r) => [
+               String(r.product_id),
+               Math.max(1, Number(r.quantity) || 1),
+            ]),
+         );
          const inCartIds = new Set(inCartRaw.map((x) => String(x)));
+         const favoriteIds = new Set(
+            (favoriteRaw ?? []).map((x) => String(x)),
+         );
          const mapped = (rows ?? [])
-            .map((row) => mapRow(row, toBuyIds, inCartIds))
+            .map((row) =>
+               mapRow(
+                  row,
+                  toBuyQuantityByProductId,
+                  inCartIds,
+                  favoriteIds,
+               ),
+            )
             .sort((a, b) =>
                a.name.localeCompare(b.name, "fr", { sensitivity: "base" }),
             );
@@ -108,16 +135,6 @@ export function useCatalogData() {
       );
    }, []);
 
-   const updateProductQuantity = useCallback((productId, newQuantity) => {
-      if (newQuantity < 1) return;
-      const key = pidKey(productId);
-      setProducts((prev) =>
-         prev.map((p) =>
-            p.documentId === key ? { ...p, quantity: newQuantity } : p,
-         ),
-      );
-   }, []);
-
    return {
       products,
       categories,
@@ -125,6 +142,5 @@ export function useCatalogData() {
       reload,
       patchProduct,
       optimisticClearShopping,
-      updateProductQuantity,
    };
 }

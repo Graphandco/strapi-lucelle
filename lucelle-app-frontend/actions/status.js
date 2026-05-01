@@ -20,8 +20,8 @@ async function requireUser(supabase) {
    return user;
 }
 
-/** @returns {Promise<string[]>} */
-export async function listToBuyProductIds() {
+/** @returns {Promise<{ product_id: string | number, quantity: number }[]>} */
+export async function listToBuyStatus() {
    const supabase = await createClient();
    const {
       data: { user },
@@ -31,15 +31,51 @@ export async function listToBuyProductIds() {
    const { data, error } = await supabase
       .schema(SCHEMA)
       .from(TABLE_TO_BUY)
-      .select("product_id")
+      .select("product_id, quantity")
       .eq("user_id", user.id);
 
    if (error) {
-      console.error("listToBuyProductIds:", error.message);
+      console.error("listToBuyStatus:", error.message);
       throw new Error(error.message);
    }
 
-   return (data ?? []).map((r) => r.product_id);
+   return (data ?? []).map((r) => ({
+      product_id: r.product_id,
+      quantity: Math.max(1, Number(r.quantity) || 1),
+   }));
+}
+
+export async function updateToBuyQuantity(productId, quantity) {
+   const supabase = await createClient();
+   const user = await requireUser(supabase);
+
+   const q = Math.floor(Number(quantity));
+   if (!Number.isFinite(q) || q < 1) {
+      throw new Error("Quantité invalide.");
+   }
+
+   const { data, error } = await supabase
+      .schema(SCHEMA)
+      .from(TABLE_TO_BUY)
+      .update({ quantity: q })
+      .eq("user_id", user.id)
+      .eq("product_id", productId)
+      .select("product_id");
+
+   if (error) {
+      console.error("updateToBuyQuantity:", error.message);
+      throw new Error(error.message);
+   }
+
+   if (!data?.length) {
+      console.error(
+         "updateToBuyQuantity: aucune ligne (product_id / user_id ?)",
+         productId,
+      );
+      throw new Error(
+         "Impossible de mettre à jour la quantité (ligne introuvable).",
+      );
+   }
 }
 
 /** @returns {Promise<string[]>} */
@@ -71,7 +107,7 @@ export async function addToBuy(productId) {
    const { error } = await supabase
       .schema(SCHEMA)
       .from(TABLE_TO_BUY)
-      .insert({ user_id: user.id, product_id: productId });
+      .insert({ user_id: user.id, product_id: productId, quantity: 1 });
 
    if (error) {
       console.error("addToBuy:", error.message);

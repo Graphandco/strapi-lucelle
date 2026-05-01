@@ -42,7 +42,7 @@ export default function SearchBar({
 
    const handleProductClick = async (product) => {
       try {
-         patchProduct?.(product.documentId, { isToBuy: true });
+         patchProduct?.(product.documentId, { isToBuy: true, quantity: 1 });
          await addToBuy(product.documentId);
          setSearchTerm("");
       } catch (error) {
@@ -65,12 +65,18 @@ export default function SearchBar({
                <ul className="py-2 grid grid-cols-4 items-center gap-7">
                   {filteredProducts.map((product) => {
                      const rawThumbnail = product.image?.formats?.thumbnail?.url;
-                     const productImage = rawThumbnail
+                     const strapiOrRelative = rawThumbnail
                         ? rawThumbnail.startsWith("http://") ||
                           rawThumbnail.startsWith("https://")
                            ? rawThumbnail
                            : `${process.env.NEXT_PUBLIC_STRAPI_URL}${rawThumbnail}`
                         : null;
+                     const productImage =
+                        product.imageUrl &&
+                        (product.imageUrl.startsWith("http://") ||
+                           product.imageUrl.startsWith("https://"))
+                           ? product.imageUrl
+                           : strapiOrRelative;
 
                      return (
                         <li

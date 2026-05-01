@@ -11,6 +11,7 @@ export async function getSupabaseProducts() {
          id,
          name,
          category_id,
+         image_url,
          category:categories (
             id,
             name

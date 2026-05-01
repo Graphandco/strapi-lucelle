@@ -7,14 +7,8 @@ import { PlusCircle } from "lucide-react";
 import { useCallback } from "react";
 
 export default function Inventaire() {
-   const {
-      products: allProducts,
-      categories,
-      loading,
-      reload,
-      patchProduct,
-      updateProductQuantity,
-   } = useCatalogData();
+   const { products: allProducts, categories, loading, reload, patchProduct } =
+      useCatalogData();
 
    const reconcile = useCallback(() => reload({ silent: true }), [reload]);
 
@@ -58,7 +52,6 @@ export default function Inventaire() {
                            pageType="inventaire"
                            patchProduct={patchProduct}
                            reconcile={reconcile}
-                           updateProductQuantity={updateProductQuantity}
                         />
                      ))}
                   </ul>

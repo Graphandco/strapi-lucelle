@@ -1,50 +1,68 @@
 "use server";
-import { getAuthTokenFromCookie } from "@/lib/auth.server";
+
+import { createClient } from "@/lib/supabase/server";
+import { tryUploadProductImageField } from "@/actions/uploadProductImage";
+
+const SCHEMA = "shopping_list";
 
 export async function addProduct(formData) {
-   const name = formData.get("name");
-   const category = Number(formData.get("category"));
-   const token = await getAuthTokenFromCookie();
-   const baseUrl = process.env.PAYLOAD_INTERNAL_URL;
+   const nameRaw = formData.get("name");
+   const categoryRaw = formData.get("category");
 
-   const product = {
-      name,
-      quantity: 1,
-      is_in_cart: false,
-      is_to_buy: true,
-      categories: Number.isFinite(category) ? [category] : [],
-   };
+   const name = typeof nameRaw === "string" ? nameRaw.trim() : "";
+   if (!name) {
+      return { success: false, error: "Le nom du produit est requis." };
+   }
+
+   const categoryId =
+      categoryRaw != null && String(categoryRaw).trim() !== ""
+         ? String(categoryRaw).trim()
+         : null;
+   if (!categoryId) {
+      return { success: false, error: "Choisis une catégorie." };
+   }
 
    try {
-      if (!token) {
-         throw new Error("Token d'authentification manquant");
-      }
-      if (!baseUrl) {
-         throw new Error("PAYLOAD_INTERNAL_URL is not defined");
+      const supabase = await createClient();
+      const {
+         data: { user },
+         error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+         return {
+            success: false,
+            error: "Tu dois être connecté pour ajouter un produit.",
+         };
       }
 
-      const response = await fetch(
-         `${baseUrl}/api/products`,
-         {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-               Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(product),
-         }
-      );
+      const imageField = formData.get("image");
+      const uploadResult = await tryUploadProductImageField(imageField);
+      if (!uploadResult.success) {
+         return { success: false, error: uploadResult.error };
+      }
 
-      if (!response.ok) {
-         const errorData = await response.json();
-         throw new Error(
-            errorData.error?.message || "Erreur lors de l'ajout du produit"
-         );
+      const row = {
+         name,
+         category_id: categoryId,
+      };
+      if (uploadResult.url) {
+         row.image_url = uploadResult.url;
+      }
+
+      const { error } = await supabase.schema(SCHEMA).from("products").insert(row);
+
+      if (error) {
+         console.error("addProduct (Supabase):", error.message);
+         return { success: false, error: error.message };
       }
 
       return { success: true };
    } catch (error) {
-      console.error("Erreur détaillée:", error);
-      return { success: false, error: error.message };
+      console.error("addProduct:", error);
+      return {
+         success: false,
+         error: error?.message || "Erreur lors de l’ajout du produit",
+      };
    }
 }

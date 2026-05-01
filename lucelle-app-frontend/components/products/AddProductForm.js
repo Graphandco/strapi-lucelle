@@ -1,12 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { addProduct } from "@/actions/addProduct";
 import { getSupabaseCategories } from "@/actions/getSupabaseProduct";
+import { toast } from "sonner";
 
 export default function AddProductForm() {
-   const router = useRouter();
+   const formRef = useRef(null);
+   const nameInputRef = useRef(null);
+   const imageInputRef = useRef(null);
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
    const [categories, setCategories] = useState([]);
@@ -32,10 +34,13 @@ export default function AddProductForm() {
 
    async function handleSubmit(event) {
       event.preventDefault();
+      const form = formRef.current;
+      if (!form) return;
+
       setLoading(true);
       setError(null);
 
-      const formData = new FormData(event.target);
+      const formData = new FormData(form);
 
       try {
          const result = await addProduct(formData);
@@ -46,7 +51,15 @@ export default function AddProductForm() {
             );
          }
 
-         router.push("/shopping-list");
+         if (nameInputRef.current) {
+            nameInputRef.current.value = "";
+         }
+         if (imageInputRef.current) {
+            imageInputRef.current.value = "";
+         }
+         toast.success("Produit ajouté avec succès");
+
+         //router.push("/shopping-list");
       } catch (error) {
          console.error("Erreur détaillée:", error);
          setError(error.message);
@@ -56,15 +69,37 @@ export default function AddProductForm() {
    }
 
    return (
-      <form onSubmit={handleSubmit} className="max-w-md space-y-4">
+      <form
+         ref={formRef}
+         onSubmit={handleSubmit}
+         className="max-w-md space-y-4"
+      >
          <div>
             <input
+               ref={nameInputRef}
                type="text"
                id="name"
                name="name"
                required
                placeholder="Nom du produit"
                className="bg-card outline-none border-none rounded-lg w-full p-4 placeholder:text-white placeholder:text-sm"
+            />
+         </div>
+
+         <div>
+            <label
+               htmlFor="image"
+               className="block text-white/70 text-sm mb-2"
+            >
+               Photo (optionnel)
+            </label>
+            <input
+               ref={imageInputRef}
+               id="image"
+               name="image"
+               type="file"
+               accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+               className="block w-full text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-black file:font-normal"
             />
          </div>
 
