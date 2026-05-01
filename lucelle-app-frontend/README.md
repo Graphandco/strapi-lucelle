@@ -186,6 +186,66 @@ create policy "lecture admin"
 
 Tu dois t’assurer que cette claim est définie côté auth (Supabase Auth, hook, etc.). Les non-admins n’ont pas besoin d’une policy séparée si une policy plus large couvre déjà les autres cas — en pratique on combine souvent plusieurs policies (une pour tous les `authenticated`, une plus stricte pour certaines opérations).
 
+### 2.6 Table `shopping_list.favorites` (favoris par utilisateur)
+
+Si l’API ou les server actions renvoient **`permission denied for table favorites`**, c’est en général un **`GRANT` manquant** sur la table (le RLS seul ne suffit pas).
+
+Exécute dans l’éditeur SQL (adapte le nom du schéma si besoin) :
+
+```sql
+-- Accès au schéma (si pas déjà fait)
+grant usage on schema shopping_list to authenticated;
+
+-- Droits SQL : lecture + ajout + suppression pour les utilisateurs connectés (JWT)
+grant select, insert, delete on table shopping_list.favorites to authenticated;
+
+-- Optionnel : comptes admin / scripts serveur avec service_role
+grant select, insert, delete on table shopping_list.favorites to service_role;
+```
+
+Puis active le **RLS** et des policies qui limitent chaque ligne à **`auth.uid()`** :
+
+```sql
+alter table shopping_list.favorites enable row level security;
+
+-- Supprimer d’anciennes policies du même nom si tu ré-exécutes le script
+drop policy if exists "favorites_select_own" on shopping_list.favorites;
+drop policy if exists "favorites_insert_own" on shopping_list.favorites;
+drop policy if exists "favorites_delete_own" on shopping_list.favorites;
+
+create policy "favorites_select_own"
+  on shopping_list.favorites
+  for select
+  to authenticated
+  using (user_id = auth.uid());
+
+create policy "favorites_insert_own"
+  on shopping_list.favorites
+  for insert
+  to authenticated
+  with check (user_id = auth.uid());
+
+create policy "favorites_delete_own"
+  on shopping_list.favorites
+  for delete
+  to authenticated
+  using (user_id = auth.uid());
+```
+
+**Ne donne pas** `insert` / `delete` sur `favorites` au rôle **`anon`** si seuls les comptes connectés doivent gérer les favoris.
+
+**Vérification des privilèges :**
+
+```sql
+select grantee, privilege_type
+from information_schema.role_table_grants
+where table_schema = 'shopping_list'
+  and table_name = 'favorites'
+order by grantee, privilege_type;
+```
+
+Tu dois voir **`authenticated`** avec au moins **SELECT**, **INSERT**, **DELETE**.
+
 ---
 
 ## 3. Nouvelles tables dans le schéma
@@ -233,3 +293,4 @@ npm run dev
 
 - Client Supabase : `supabase-client.js`
 - Exemple server action + schéma custom : `actions/getSupabaseProduct.js`
+- Favoris (session utilisateur + cookies) : `actions/favorites.js`

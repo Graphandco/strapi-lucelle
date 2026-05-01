@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
 import { getSupabaseProducts } from "@/actions/getSupabaseProduct";
+import { getFavoriteProductIds } from "@/actions/favorites";
 import ProductCard from "@/components/products/ProductCard";
+import SupabaseProductRow from "@/components/products/SupabaseProductRow";
 import Image from "next/image";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
@@ -13,12 +15,17 @@ export default function Homepage() {
    const { allProducts, loading } = useProducts();
    const [supabaseProducts, setSupabaseProducts] = useState([]);
    const [supabaseError, setSupabaseError] = useState(null);
+   const [favoriteIdSet, setFavoriteIdSet] = useState(() => new Set());
 
    useEffect(() => {
       let cancelled = false;
-      getSupabaseProducts()
-         .then((rows) => {
-            if (!cancelled) setSupabaseProducts(rows);
+      Promise.all([getSupabaseProducts(), getFavoriteProductIds()])
+         .then(([rows, favoriteIds]) => {
+            if (cancelled) return;
+            setSupabaseProducts(rows);
+            setFavoriteIdSet(
+               new Set(favoriteIds.map((id) => (id == null ? "" : String(id)))),
+            );
          })
          .catch((err) => {
             if (!cancelled) setSupabaseError(err.message ?? "Erreur Supabase");
@@ -26,7 +33,7 @@ export default function Homepage() {
       return () => {
          cancelled = true;
       };
-   }, []);
+   }, [user?.id]);
 
    // Filtrer les produits qui sont à acheter
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
@@ -90,17 +97,15 @@ export default function Homepage() {
                {supabaseError ? (
                   <p className="text-destructive text-sm">{supabaseError}</p>
                ) : (
-                  <ul className="text-white text-sm list-disc list-inside space-y-1">
+                  <ul className="rounded-lg border border-white/10 bg-card px-3">
                      {supabaseProducts.map((row, i) => (
-                        <li key={row.id ?? `${row.name}-${i}`}>
-                           {row.name}
-                           {row.category?.name != null && (
-                              <span className="text-white/60">
-                                 {" "}
-                                 — {row.category.name}
-                              </span>
+                        <SupabaseProductRow
+                           key={row.id ?? `${row.name}-${i}`}
+                           product={row}
+                           initialFavorite={favoriteIdSet.has(
+                              row.id == null ? "" : String(row.id),
                            )}
-                        </li>
+                        />
                      ))}
                   </ul>
                )}
