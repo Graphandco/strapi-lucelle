@@ -45,8 +45,14 @@ export function useCatalogData() {
    const [categories, setCategories] = useState([]);
    const [loading, setLoading] = useState(true);
 
-   const reload = useCallback(async () => {
-      setLoading(true);
+   /**
+    * @param {{ silent?: boolean }} opts — `silent: true` : met à jour les données sans passer par l’écran « Chargement… »
+    */
+   const reload = useCallback(async (opts = {}) => {
+      const silent = opts.silent === true;
+      if (!silent) {
+         setLoading(true);
+      }
       try {
          const [rows, cats, toBuyRaw, inCartRaw] = await Promise.all([
             getSupabaseProducts(),
@@ -72,13 +78,35 @@ export function useCatalogData() {
       } catch (e) {
          console.error("useCatalogData:", e);
       } finally {
-         setLoading(false);
+         if (!silent) {
+            setLoading(false);
+         }
       }
    }, []);
 
    useEffect(() => {
       reload();
    }, [user?.id, reload]);
+
+   const patchProduct = useCallback((productId, partial) => {
+      const key = pidKey(productId);
+      setProducts((prev) =>
+         prev.map((p) =>
+            p.documentId === key ? { ...p, ...partial } : p,
+         ),
+      );
+   }, []);
+
+   /** Aligné sur `clearAllShopping` côté UI (panier vidé + retrait « à acheter » pour ce qui était au panier). */
+   const optimisticClearShopping = useCallback(() => {
+      setProducts((prev) =>
+         prev.map((p) =>
+            p.isInCart
+               ? { ...p, isInCart: false, isToBuy: false }
+               : { ...p, isInCart: false },
+         ),
+      );
+   }, []);
 
    const updateProductQuantity = useCallback((productId, newQuantity) => {
       if (newQuantity < 1) return;
@@ -95,6 +123,8 @@ export function useCatalogData() {
       categories,
       loading,
       reload,
+      patchProduct,
+      optimisticClearShopping,
       updateProductQuantity,
    };
 }

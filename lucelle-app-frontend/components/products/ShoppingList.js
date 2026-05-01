@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import SearchBar from "@/components/products/SearchBar";
 import {
    Accordion,
@@ -16,9 +16,18 @@ import ConfirmAlert from "@/components/ConfirmAlert";
 import { clearAllShopping } from "@/actions/status";
 
 export default function ShoppingList() {
-   const { products: allProducts, categories, loading, reload, updateProductQuantity } =
-      useCatalogData();
+   const {
+      products: allProducts,
+      categories,
+      loading,
+      reload,
+      patchProduct,
+      optimisticClearShopping,
+      updateProductQuantity,
+   } = useCatalogData();
    const [isClearing, setIsClearing] = useState(false);
+
+   const reconcile = useCallback(() => reload({ silent: true }), [reload]);
 
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    const productsNotInCart = productsToBuy.filter(
@@ -30,11 +39,12 @@ export default function ShoppingList() {
       if (isClearing) return;
 
       setIsClearing(true);
+      optimisticClearShopping();
       try {
          await clearAllShopping();
-         await reload();
       } catch (error) {
          console.error("Erreur lors du vidage de la liste:", error);
+         await reload({ silent: true });
       } finally {
          setIsClearing(false);
       }
@@ -56,7 +66,11 @@ export default function ShoppingList() {
                ({productsNotInCart.length})
             </span>
          </h1>
-         <SearchBar allProducts={allProducts} onReload={reload} />
+         <SearchBar
+            allProducts={allProducts}
+            patchProduct={patchProduct}
+            reconcile={reconcile}
+         />
          {productsToBuy.length === 0 ? (
             <>
                <p className="text-center text-white">
@@ -93,7 +107,8 @@ export default function ShoppingList() {
                                        key={product.documentId}
                                        product={product}
                                        pageType="shopping-list"
-                                       onReload={reload}
+                                       patchProduct={patchProduct}
+                                       reconcile={reconcile}
                                        updateProductQuantity={
                                           updateProductQuantity
                                        }
@@ -121,7 +136,8 @@ export default function ShoppingList() {
                                           key={product.documentId}
                                           product={product}
                                           pageType="shopping-list"
-                                          onReload={reload}
+                                          patchProduct={patchProduct}
+                                          reconcile={reconcile}
                                           updateProductQuantity={
                                              updateProductQuantity
                                           }

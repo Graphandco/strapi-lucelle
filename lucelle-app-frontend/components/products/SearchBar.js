@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { addToBuy } from "@/actions/status";
 
-export default function SearchBar({ allProducts, onReload }) {
+export default function SearchBar({
+   allProducts,
+   patchProduct,
+   reconcile,
+}) {
    const [searchTerm, setSearchTerm] = useState("");
    const [filteredProducts, setFilteredProducts] = useState([]);
 
@@ -38,11 +42,12 @@ export default function SearchBar({ allProducts, onReload }) {
 
    const handleProductClick = async (product) => {
       try {
+         patchProduct?.(product.documentId, { isToBuy: true });
          await addToBuy(product.documentId);
          setSearchTerm("");
-         await onReload?.();
       } catch (error) {
          console.error("Erreur ajout à acheter:", error);
+         await reconcile?.();
       }
    };
 

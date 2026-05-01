@@ -4,10 +4,19 @@ import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
+import { useCallback } from "react";
 
 export default function Inventaire() {
-   const { products: allProducts, categories, loading, reload, updateProductQuantity } =
-      useCatalogData();
+   const {
+      products: allProducts,
+      categories,
+      loading,
+      reload,
+      patchProduct,
+      updateProductQuantity,
+   } = useCatalogData();
+
+   const reconcile = useCallback(() => reload({ silent: true }), [reload]);
 
    if (loading) {
       return <div>Chargement...</div>;
@@ -47,7 +56,8 @@ export default function Inventaire() {
                            key={product.documentId}
                            product={product}
                            pageType="inventaire"
-                           onReload={reload}
+                           patchProduct={patchProduct}
+                           reconcile={reconcile}
                            updateProductQuantity={updateProductQuantity}
                         />
                      ))}

@@ -5,10 +5,14 @@ import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
 import Image from "next/image";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useCallback } from "react";
 
 export default function Homepage() {
    const { user } = useAuth();
-   const { products: allProducts, loading, reload } = useCatalogData();
+   const { products: allProducts, loading, reload, patchProduct } =
+      useCatalogData();
+
+   const reconcile = useCallback(() => reload({ silent: true }), [reload]);
 
    /** À acheter mais pas encore marqués « dans le panier » (rappel avant / pendant les courses). */
    const productsToBuyNotInCart = allProducts.filter(
@@ -51,7 +55,8 @@ export default function Homepage() {
                         key={product.documentId}
                         product={product}
                         pageType="homepage"
-                        onReload={reload}
+                        patchProduct={patchProduct}
+                        reconcile={reconcile}
                      />
                   ))}
                </ul>

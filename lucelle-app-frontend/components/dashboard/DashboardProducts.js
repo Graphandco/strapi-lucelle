@@ -17,7 +17,7 @@ export default function DashboardProducts() {
          if (!response?.success) {
             throw new Error(response?.error || "Échec de la suppression");
          }
-         await reload();
+         await reload({ silent: true });
       } catch (error) {
          console.error(error);
       }

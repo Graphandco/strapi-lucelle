@@ -8,7 +8,8 @@ import { addToBuy, removeToBuy, addInCart, removeInCart } from "@/actions/status
 const ProductCard = ({
    product,
    pageType,
-   onReload,
+   patchProduct,
+   reconcile,
    updateProductQuantity,
 }) => {
    const rawThumbnail = product.image?.formats?.thumbnail?.url;
@@ -50,25 +51,30 @@ const ProductCard = ({
             onClick={async () => {
                try {
                   if (pageType === "inventaire") {
-                     if (product.isToBuy) {
-                        await removeToBuy(product.documentId);
-                     } else {
+                     const nextToBuy = !product.isToBuy;
+                     patchProduct?.(product.documentId, { isToBuy: nextToBuy });
+                     if (nextToBuy) {
                         await addToBuy(product.documentId);
+                     } else {
+                        await removeToBuy(product.documentId);
                      }
                   } else if (pageType === "homepage") {
                      if (!product.isInCart) {
+                        patchProduct?.(product.documentId, { isInCart: true });
                         await addInCart(product.documentId);
                      }
                   } else if (pageType === "shopping-list") {
                      if (product.isInCart) {
+                        patchProduct?.(product.documentId, { isInCart: false });
                         await removeInCart(product.documentId);
                      } else {
+                        patchProduct?.(product.documentId, { isInCart: true });
                         await addInCart(product.documentId);
                      }
                   }
-                  await onReload?.();
                } catch (error) {
                   console.error("Erreur statut produit:", error);
+                  await reconcile?.();
                }
             }}
          >
