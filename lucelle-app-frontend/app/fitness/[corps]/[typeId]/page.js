@@ -24,7 +24,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function ExerciceTypePage() {
    const { corps, typeId } = useParams();
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const {
       exerciceTypes,
       loading,
@@ -45,7 +45,7 @@ export default function ExerciceTypePage() {
 
       setDeletingId(exerciceId);
       try {
-         await deleteExercice(exerciceId, jwt);
+         await deleteExercice(exerciceId);
       } catch (error) {
          console.error("Erreur lors de la suppression:", error);
          alert("Erreur lors de la suppression de l'exercice");

@@ -22,7 +22,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function Course() {
    const { allCourses, loading, deleteCourse } = useExercices();
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [deletingId, setDeletingId] = useState(null);
 
@@ -36,7 +36,7 @@ export default function Course() {
       setDeletingId(courseId);
       try {
          console.log("[handleDelete] Appel deleteCourse...");
-         await deleteCourse(courseId, jwt);
+         await deleteCourse(courseId);
          console.log("[handleDelete] deleteCourse terminé");
       } catch (error) {
          console.error("Erreur lors de la suppression:", error);

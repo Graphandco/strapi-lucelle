@@ -22,7 +22,7 @@ import {
    ChartTooltip,
    ChartTooltipContent,
 } from "@/components/ui/chart";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon, PlusIcon } from "lucide-react";
 import ListePoids from "./ListePoids";
@@ -39,7 +39,6 @@ import {
 
 export default function StatsPoids() {
    const { allWeights, loading } = useWeights();
-   const { poids, date } = allWeights;
    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
    // Calcule le mois en cours pour l'état initial
@@ -49,6 +48,14 @@ export default function StatsPoids() {
    };
 
    const [currentMonth, setCurrentMonth] = useState(getCurrentMonthIndex());
+
+   if (loading) {
+      return (
+         <div className="flex justify-center py-16 text-muted-foreground">
+            Chargement des mesures…
+         </div>
+      );
+   }
 
    // Récupère tous les mois disponibles dans les données
    const allAvailableMonths = Array.from(
@@ -104,7 +111,8 @@ export default function StatsPoids() {
          );
          const daysInMonth = monthEnd.getDate();
          const dayOfMonth = currentDate.getDate();
-         const relativePosition = (dayOfMonth - 1) / (daysInMonth - 1); // 0 à 1
+         const relativePosition =
+            daysInMonth <= 1 ? 0 : (dayOfMonth - 1) / (daysInMonth - 1);
 
          // Trouve l'index du mois dans la liste des mois du trimestre
          const monthKey = format(currentDate, "yyyy-MM");

@@ -11,6 +11,11 @@ const nextConfig = {
             hostname: "shopping-list-admin.graphandco.com",
             pathname: "/uploads/**",
          },
+         {
+            protocol: "https",
+            hostname: "payload.graphandco.com",
+            // pathname: "/api/media/file/**",
+         },
       ],
    },
 };

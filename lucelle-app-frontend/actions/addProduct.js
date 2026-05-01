@@ -1,25 +1,30 @@
 "use server";
+import { getAuthTokenFromCookie } from "@/lib/auth.server";
 
 export async function addProduct(formData) {
    const name = formData.get("name");
-   const isInCart = formData.get("isInCart") === "true";
-   const isToBuy = formData.get("isToBuy") === "true";
-   const category = formData.get("category");
-   const token = formData.get("token");
+   const category = Number(formData.get("category"));
+   const token = await getAuthTokenFromCookie();
+   const baseUrl = process.env.PAYLOAD_INTERNAL_URL;
 
    const product = {
-      data: {
-         name,
-         quantity: 1,
-         isInCart: false,
-         isToBuy: true,
-         category: parseInt(category),
-      },
+      name,
+      quantity: 1,
+      is_in_cart: false,
+      is_to_buy: true,
+      categories: Number.isFinite(category) ? [category] : [],
    };
 
    try {
+      if (!token) {
+         throw new Error("Token d'authentification manquant");
+      }
+      if (!baseUrl) {
+         throw new Error("PAYLOAD_INTERNAL_URL is not defined");
+      }
+
       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products`,
+         `${baseUrl}/api/products`,
          {
             method: "POST",
             headers: {

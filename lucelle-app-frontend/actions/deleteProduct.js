@@ -1,9 +1,19 @@
 "use server";
+import { getAuthTokenFromCookie } from "@/lib/auth.server";
 
-export async function deleteProduct(documentId, token) {
+export async function deleteProduct(documentId) {
    try {
+      const token = await getAuthTokenFromCookie();
+      const baseUrl = process.env.PAYLOAD_INTERNAL_URL;
+      if (!token) {
+         throw new Error("Token d'authentification manquant");
+      }
+      if (!baseUrl) {
+         throw new Error("PAYLOAD_INTERNAL_URL is not defined");
+      }
+
       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${documentId}`,
+         `${baseUrl}/api/products/${documentId}`,
          {
             method: "DELETE",
             headers: {

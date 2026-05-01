@@ -17,7 +17,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function AddCourseForm({ onSuccess }) {
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const { refreshCourses } = useExercices();
    const router = useRouter();
    const [loading, setLoading] = useState(false);
@@ -49,7 +49,6 @@ export default function AddCourseForm({ onSuccess }) {
       setError(null);
 
       const formData = new FormData(event.target);
-      formData.append("token", jwt);
       formData.append("date", format(date, "yyyy-MM-dd"));
 
       try {

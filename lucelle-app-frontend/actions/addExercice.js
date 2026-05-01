@@ -1,4 +1,5 @@
 "use server";
+import { getAuthTokenFromCookie } from "@/lib/auth.server";
 
 export async function addExercice(formData) {
    try {
@@ -7,13 +8,20 @@ export async function addExercice(formData) {
       const poids = formData.get("poids");
       const date = formData.get("date");
       const typeId = formData.get("typeId");
-      const token = formData.get("token");
+      const token = await getAuthTokenFromCookie();
 
       // Validation des champs requis
-      if (!series || !repetitions || !date || !typeId || !token) {
+      if (!series || !repetitions || !date || !typeId) {
          return {
             success: false,
             error: "Tous les champs sont requis",
+         };
+      }
+
+      if (!token) {
+         return {
+            success: false,
+            error: "Token d'authentification manquant",
          };
       }
 

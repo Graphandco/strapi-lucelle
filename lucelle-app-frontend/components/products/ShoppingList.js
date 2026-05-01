@@ -24,7 +24,7 @@ export default function ShoppingList() {
       updateProductQuantity,
       loading,
    } = useProducts();
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const [isClearing, setIsClearing] = useState(false);
 
    // Filtrer les produits qui sont à acheter
@@ -37,7 +37,7 @@ export default function ShoppingList() {
    const productsInCart = productsToBuy.filter((product) => product.isInCart);
 
    const handleClearCart = async () => {
-      if (!jwt || isClearing) return;
+      if (isClearing) return;
 
       setIsClearing(true);
       try {
@@ -45,18 +45,16 @@ export default function ShoppingList() {
          for (const product of productsInCart) {
             try {
                // Réinitialiser la quantité à 1
-               await updateProductQuantity(product.documentId, 1, jwt);
+               await updateProductQuantity(product.documentId, 1);
                // Mettre à jour le statut isToBuy
                await updateProductToBuy(
                   product.documentId,
-                  product.isToBuy,
-                  jwt
+                  product.isToBuy
                );
                // Mettre à jour le statut isInCart
                await updateProductInCart(
                   product.documentId,
-                  product.isInCart,
-                  jwt
+                  product.isInCart
                );
             } catch (error) {
                console.error(

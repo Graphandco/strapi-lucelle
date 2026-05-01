@@ -7,20 +7,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MinusCircle, PlusCircle } from "lucide-react";
 
 const ProductCard = ({ product, pageType }) => {
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const { updateProductInCart, updateProductToBuy, updateProductQuantity } =
       useProducts();
-   const productImage = product.image?.formats?.thumbnail?.url
-      ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${product.image.formats.thumbnail.url}`
+   const rawThumbnail = product.image?.formats?.thumbnail?.url;
+   const productImage = rawThumbnail
+      ? rawThumbnail.startsWith("http://") ||
+        rawThumbnail.startsWith("https://")
+         ? rawThumbnail
+         : `${process.env.NEXT_PUBLIC_STRAPI_URL}${rawThumbnail}`
       : null;
    const isToBuy = pageType === "inventaire" && product.isToBuy;
    const showQuantity =
       pageType === "inventaire" || pageType === "shopping-list";
 
    const handleQuantityChange = async (newQuantity) => {
-      if (!jwt || newQuantity < 0) return;
+      if (newQuantity < 0) return;
       try {
-         await updateProductQuantity(product.documentId, newQuantity, jwt);
+         await updateProductQuantity(product.documentId, newQuantity);
       } catch (error) {
          console.error("Erreur lors de la mise à jour de la quantité:", error);
       }
@@ -40,22 +44,16 @@ const ProductCard = ({ product, pageType }) => {
                },
             }}
             className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer not-last:border-b border-white/10 ${
-               isToBuy ? "!opacity-20 " : "opacity-100"
+               isToBuy ? "opacity-20! " : "opacity-100"
             }`}
             onClick={async () => {
-               if (!jwt) return;
                if (pageType !== "inventaire") {
                   await updateProductInCart(
                      product.documentId,
                      product.isInCart,
-                     jwt
                   );
                } else {
-                  await updateProductToBuy(
-                     product.documentId,
-                     product.isToBuy,
-                     jwt
-                  );
+                  await updateProductToBuy(product.documentId, product.isToBuy);
                }
             }}
          >

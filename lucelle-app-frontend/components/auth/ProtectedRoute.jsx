@@ -1,18 +1,22 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function ProtectedRoute({ children, redirectTo = "/" }) {
+export default function ProtectedRoute({ children, redirectTo }) {
    const { isAuthenticated, isLoading } = useAuth();
    const router = useRouter();
+   const pathname = usePathname();
+
+   const loginHref =
+      redirectTo || `/login?next=${encodeURIComponent(pathname)}`;
 
    useEffect(() => {
       if (!isLoading && !isAuthenticated) {
-         router.push(redirectTo);
+         router.replace(loginHref);
       }
-   }, [isAuthenticated, isLoading, router, redirectTo]);
+   }, [isAuthenticated, isLoading, router, loginHref]);
 
    if (isLoading) {
       return (

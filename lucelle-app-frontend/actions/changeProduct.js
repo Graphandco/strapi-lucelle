@@ -1,23 +1,27 @@
 "use server";
+import { getAuthTokenFromCookie } from "@/lib/auth.server";
 
-export async function changeProductToBuy(productId, currentStatus, token) {
+export async function changeProductToBuy(productId, currentStatus) {
    try {
+      const token = await getAuthTokenFromCookie();
+      const baseUrl = process.env.PAYLOAD_INTERNAL_URL;
       if (!token) {
          throw new Error("No authentication token provided");
       }
+      if (!baseUrl) {
+         throw new Error("PAYLOAD_INTERNAL_URL is not defined");
+      }
 
       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
+         `${baseUrl}/api/products/${productId}`,
          {
-            method: "PUT",
+            method: "PATCH",
             headers: {
                "Content-Type": "application/json",
                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-               data: {
-                  isToBuy: !currentStatus,
-               },
+               is_to_buy: !currentStatus,
             }),
          }
       );
@@ -39,26 +43,29 @@ export async function changeProductToBuy(productId, currentStatus, token) {
    }
 }
 
-export async function changeProductInCart(productId, currentStatus, token) {
+export async function changeProductInCart(productId, currentStatus) {
    try {
+      const token = await getAuthTokenFromCookie();
+      const baseUrl = process.env.PAYLOAD_INTERNAL_URL;
       if (!token) {
          throw new Error("No authentication token provided");
+      }
+      if (!baseUrl) {
+         throw new Error("PAYLOAD_INTERNAL_URL is not defined");
       }
 
       console.log("Updating product:", { productId, currentStatus });
 
       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
+         `${baseUrl}/api/products/${productId}`,
          {
-            method: "PUT",
+            method: "PATCH",
             headers: {
                "Content-Type": "application/json",
                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-               data: {
-                  isInCart: !currentStatus,
-               },
+               is_in_cart: !currentStatus,
             }),
          }
       );
@@ -82,10 +89,15 @@ export async function changeProductInCart(productId, currentStatus, token) {
    }
 }
 
-export async function changeProductQuantity(productId, quantity, token) {
+export async function changeProductQuantity(productId, quantity) {
    try {
+      const token = await getAuthTokenFromCookie();
+      const baseUrl = process.env.PAYLOAD_INTERNAL_URL;
       if (!token) {
          throw new Error("No authentication token provided");
+      }
+      if (!baseUrl) {
+         throw new Error("PAYLOAD_INTERNAL_URL is not defined");
       }
 
       if (typeof quantity !== "number" || quantity < 0) {
@@ -93,17 +105,15 @@ export async function changeProductQuantity(productId, quantity, token) {
       }
 
       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
+         `${baseUrl}/api/products/${productId}`,
          {
-            method: "PUT",
+            method: "PATCH",
             headers: {
                "Content-Type": "application/json",
                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-               data: {
-                  quantity: quantity,
-               },
+               quantity,
             }),
          }
       );

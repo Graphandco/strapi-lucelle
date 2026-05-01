@@ -17,7 +17,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function AddWeightForm({ onSuccess }) {
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const { refreshWeights } = useWeights();
    const router = useRouter();
    const [loading, setLoading] = useState(false);
@@ -31,7 +31,6 @@ export default function AddWeightForm({ onSuccess }) {
       setError(null);
 
       const formData = new FormData(event.target);
-      formData.append("token", jwt);
       formData.append("date", format(date, "yyyy-MM-dd"));
 
       try {

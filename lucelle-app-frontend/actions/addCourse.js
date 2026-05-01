@@ -1,4 +1,5 @@
 "use server";
+import { getAuthTokenFromCookie } from "@/lib/auth.server";
 
 export async function addCourse(formData) {
    try {
@@ -6,7 +7,7 @@ export async function addCourse(formData) {
       const duree = formData.get("duree");
       const distance = formData.get("distance");
       const vitesse = formData.get("vitesse");
-      const token = formData.get("token");
+      const token = await getAuthTokenFromCookie();
 
       // Validation du token
       if (!token) {

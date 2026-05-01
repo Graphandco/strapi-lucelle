@@ -7,7 +7,7 @@ import { useState } from "react";
 import { addProduct } from "@/actions/addProduct";
 
 export default function AddProductForm() {
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const { refreshProducts, categories } = useProducts();
    const router = useRouter();
    const [loading, setLoading] = useState(false);
@@ -19,7 +19,6 @@ export default function AddProductForm() {
       setError(null);
 
       const formData = new FormData(event.target);
-      formData.append("token", jwt);
 
       try {
          const result = await addProduct(formData);

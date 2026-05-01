@@ -1,6 +1,14 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import {
+   changeProductInCart,
+   changeProductQuantity,
+   changeProductToBuy,
+} from "@/actions/changeProduct";
+import { deleteProduct as deleteProductAction } from "@/actions/deleteProduct";
+import { getPayloadProducts } from "@/actions/getPayloadProducts";
+import { getPayloadCategories } from "@/actions/getPayloadCategories";
 
 const ProductContext = createContext();
 
@@ -17,19 +25,7 @@ export function ProductProvider({ children }) {
 
    const loadAllProducts = async () => {
       try {
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products?populate=*&pagination[limit]=500`,
-            {
-               cache: "no-store",
-            }
-         );
-
-         if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des produits");
-         }
-
-         const json = await response.json();
-         const data = json.data || [];
+         const data = await getPayloadProducts();
 
          // Trier les produits par nom
          const sortedData = data.sort((a, b) =>
@@ -45,19 +41,7 @@ export function ProductProvider({ children }) {
 
    const loadAllCategories = async () => {
       try {
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/categories?populate=*&pagination[limit]=500`,
-            {
-               cache: "no-store",
-            }
-         );
-
-         if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des catégories");
-         }
-
-         const json = await response.json();
-         const data = json.data || [];
+         const data = await getPayloadCategories();
 
          // Trier les catégories par nom
          const sortedData = data.sort((a, b) =>
@@ -69,7 +53,7 @@ export function ProductProvider({ children }) {
       }
    };
 
-   const updateProductInCart = async (productId, currentStatus, token) => {
+   const updateProductInCart = async (productId, currentStatus) => {
       try {
          // Mise à jour optimiste de l'UI
          setAllProducts((prevProducts) =>
@@ -80,24 +64,8 @@ export function ProductProvider({ children }) {
             )
          );
 
-         // Mise à jour dans Strapi
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
-            {
-               method: "PUT",
-               headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-               },
-               body: JSON.stringify({
-                  data: {
-                     isInCart: !currentStatus,
-                  },
-               }),
-            }
-         );
-
-         if (!response.ok) {
+         const response = await changeProductInCart(productId, currentStatus);
+         if (!response) {
             // En cas d'erreur, on revient à l'état précédent
             setAllProducts((prevProducts) =>
                prevProducts.map((product) =>
@@ -114,7 +82,7 @@ export function ProductProvider({ children }) {
       }
    };
 
-   const updateProductToBuy = async (productId, currentStatus, token) => {
+   const updateProductToBuy = async (productId, currentStatus) => {
       try {
          // Mise à jour optimiste de l'UI
          setAllProducts((prevProducts) =>
@@ -125,24 +93,8 @@ export function ProductProvider({ children }) {
             )
          );
 
-         // Mise à jour dans Strapi
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
-            {
-               method: "PUT",
-               headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-               },
-               body: JSON.stringify({
-                  data: {
-                     isToBuy: !currentStatus,
-                  },
-               }),
-            }
-         );
-
-         if (!response.ok) {
+         const response = await changeProductToBuy(productId, currentStatus);
+         if (!response) {
             // En cas d'erreur, on revient à l'état précédent
             setAllProducts((prevProducts) =>
                prevProducts.map((product) =>
@@ -159,7 +111,7 @@ export function ProductProvider({ children }) {
       }
    };
 
-   const updateProductQuantity = async (productId, newQuantity, token) => {
+   const updateProductQuantity = async (productId, newQuantity) => {
       try {
          // Mise à jour optimiste de l'UI
          setAllProducts((prevProducts) =>
@@ -170,24 +122,8 @@ export function ProductProvider({ children }) {
             )
          );
 
-         // Mise à jour dans Strapi
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
-            {
-               method: "PUT",
-               headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-               },
-               body: JSON.stringify({
-                  data: {
-                     quantity: newQuantity,
-                  },
-               }),
-            }
-         );
-
-         if (!response.ok) {
+         const response = await changeProductQuantity(productId, newQuantity);
+         if (!response) {
             // En cas d'erreur, on revient à l'état précédent
             setAllProducts((prevProducts) =>
                prevProducts.map((product) =>
@@ -204,29 +140,18 @@ export function ProductProvider({ children }) {
       }
    };
 
-   const deleteProduct = async (productId, token) => {
+   const deleteProduct = async (productId) => {
       try {
          // Mise à jour optimiste de l'UI
          setAllProducts((prevProducts) =>
             prevProducts.filter((product) => product.documentId !== productId)
          );
 
-         // Suppression dans Strapi
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products/${productId}`,
-            {
-               method: "DELETE",
-               headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-               },
-            }
-         );
-
-         if (!response.ok) {
+         const response = await deleteProductAction(productId);
+         if (!response?.success) {
             // En cas d'erreur, on revient à l'état précédent
             await loadAllProducts();
-            throw new Error("Failed to delete product");
+            throw new Error(response?.error || "Failed to delete product");
          }
       } catch (error) {
          console.error("Error deleting product:", error);

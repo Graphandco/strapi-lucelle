@@ -1,7 +1,8 @@
 "use server";
+
 import { getAuthTokenFromCookie } from "@/lib/auth.server";
 
-export async function deleteCourse(courseId) {
+export async function deleteExercice(exerciceId) {
    try {
       const token = await getAuthTokenFromCookie();
       if (!token) {
@@ -9,7 +10,7 @@ export async function deleteCourse(courseId) {
       }
 
       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/courses/${courseId}`,
+         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exercices/${exerciceId}`,
          {
             method: "DELETE",
             headers: {
@@ -20,12 +21,12 @@ export async function deleteCourse(courseId) {
       );
 
       if (!response.ok) {
-         throw new Error("Failed to delete course");
+         throw new Error("Failed to delete exercice");
       }
 
       return { success: true };
    } catch (error) {
-      console.error("Error deleting course:", error);
+      console.error("Error deleting exercice:", error);
       return { success: false, error: error.message };
    }
 }

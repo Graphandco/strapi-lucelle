@@ -1,12 +1,11 @@
 "use client";
 
 import { createContext, useContext, useReducer, useEffect } from "react";
-import { getMe } from "../actions/auth";
+import { getMe, logout as serverLogout } from "../actions/auth";
 
 // État initial
 const initialState = {
    user: null,
-   jwt: null,
    isLoading: true,
    isAuthenticated: false,
 };
@@ -26,7 +25,6 @@ function authReducer(state, action) {
          return {
             ...state,
             user: action.payload.user,
-            jwt: action.payload.jwt,
             isAuthenticated: true,
             isLoading: false,
          };
@@ -35,7 +33,6 @@ function authReducer(state, action) {
          return {
             ...state,
             user: null,
-            jwt: null,
             isAuthenticated: false,
             isLoading: false,
          };
@@ -50,7 +47,6 @@ function authReducer(state, action) {
          return {
             ...state,
             user: action.payload.user,
-            jwt: action.payload.jwt,
             isAuthenticated: !!action.payload.user,
             isLoading: false,
          };
@@ -70,46 +66,36 @@ export function AuthProvider({ children }) {
    // Vérifier l'authentification au chargement
    useEffect(() => {
       const checkAuth = async () => {
-         const jwt = localStorage.getItem("strapi_jwt");
-
-         if (jwt) {
-            try {
-               const result = await getMe(jwt);
-               if (result.success) {
-                  dispatch({
-                     type: AUTH_ACTIONS.SET_USER,
-                     payload: { user: result.user, jwt },
-                  });
-               } else {
-                  // JWT invalide, supprimer du localStorage
-                  localStorage.removeItem("strapi_jwt");
-                  dispatch({ type: AUTH_ACTIONS.LOGOUT });
-               }
-            } catch (error) {
-               console.error("Erreur lors de la vérification de l'authentification:", error);
-               localStorage.removeItem("strapi_jwt");
-               dispatch({ type: AUTH_ACTIONS.LOGOUT });
+         try {
+            const result = await getMe();
+            if (result.success) {
+               dispatch({
+                  type: AUTH_ACTIONS.SET_USER,
+                  payload: { user: result.user },
+               });
+               return;
             }
-         } else {
-            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+         } catch (error) {
+            console.error("Erreur lors de la vérification de l'authentification:", error);
          }
+
+         dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
       };
 
       checkAuth();
    }, []);
 
    // Fonction de connexion
-   const login = (user, jwt) => {
-      localStorage.setItem("strapi_jwt", jwt);
+   const login = (user) => {
       dispatch({
          type: AUTH_ACTIONS.LOGIN_SUCCESS,
-         payload: { user, jwt },
+         payload: { user },
       });
    };
 
    // Fonction de déconnexion
-   const logout = () => {
-      localStorage.removeItem("strapi_jwt");
+   const logout = async () => {
+      await serverLogout();
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
    };
 
@@ -117,7 +103,7 @@ export function AuthProvider({ children }) {
    const updateUser = (user) => {
       dispatch({
          type: AUTH_ACTIONS.SET_USER,
-         payload: { user, jwt: state.jwt },
+         payload: { user },
       });
    };
 

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { login } from "@/actions/auth";
+import { createClient } from "@/lib/supabase/client";
+import { mapSupabaseUser } from "@/lib/auth/map-user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -10,7 +11,7 @@ import { toast } from "sonner";
 
 export default function LoginModal({ isOpen, onClose }) {
    const [formData, setFormData] = useState({
-      identifier: "",
+      email: "",
       password: "",
    });
    const [isLoading, setIsLoading] = useState(false);
@@ -24,17 +25,29 @@ export default function LoginModal({ isOpen, onClose }) {
       setError("");
 
       try {
-         const result = await login(formData.identifier, formData.password);
+         const supabase = createClient();
+         const { data, error: signInError } =
+            await supabase.auth.signInWithPassword({
+               email: formData.email,
+               password: formData.password,
+            });
 
-         if (result.success) {
-            loginUser(result.user, result.jwt);
-            toast.success("Connexion réussie !");
-            onClose();
-         } else {
-            setError(result.error);
+         if (signInError) {
+            setError(signInError.message);
             toast.error("Erreur de connexion");
+            return;
          }
-      } catch (error) {
+
+         if (!data.user) {
+            setError("Connexion impossible");
+            toast.error("Erreur de connexion");
+            return;
+         }
+
+         loginUser(mapSupabaseUser(data.user));
+         toast.success("Connexion réussie !");
+         onClose();
+      } catch (err) {
          setError("Une erreur est survenue lors de la connexion");
          toast.error("Erreur de connexion");
       } finally {
@@ -69,17 +82,17 @@ export default function LoginModal({ isOpen, onClose }) {
 
                <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                     <label htmlFor="identifier" className="text-sm font-medium">
-                        Email ou nom d'utilisateur
+                     <label htmlFor="email" className="text-sm font-medium">
+                        Adresse email
                      </label>
                      <Input
-                        id="identifier"
-                        name="identifier"
-                        type="text"
-                        value={formData.identifier}
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
                         onChange={handleChange}
                         required
-                        placeholder="Entrez votre email ou nom d'utilisateur"
+                        placeholder="Entrez votre email"
                      />
                   </div>
 

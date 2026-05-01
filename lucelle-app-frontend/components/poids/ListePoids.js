@@ -1,11 +1,9 @@
 import { useWeights } from "@/contexts/WeightContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 export default function ListePoids({ allWeights }) {
    const { deleteWeight } = useWeights();
-   const { user, jwt } = useAuth();
    const [deletingId, setDeletingId] = useState(null);
 
    const handleDelete = async (weightId) => {
@@ -16,7 +14,7 @@ export default function ListePoids({ allWeights }) {
       setDeletingId(weightId);
 
       try {
-         await deleteWeight(weightId, jwt);
+         await deleteWeight(weightId);
       } catch (error) {
          console.error("Erreur lors de la suppression:", error);
          alert("Erreur lors de la suppression de la mesure");

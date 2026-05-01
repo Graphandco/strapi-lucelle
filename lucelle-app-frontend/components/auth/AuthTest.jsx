@@ -1,22 +1,32 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { login } from "@/actions/auth";
+import { createClient } from "@/lib/supabase/client";
+import { mapSupabaseUser } from "@/lib/auth/map-user";
 
 export default function AuthTest() {
-   const { user, loading } = useAuth();
+   const { user, isLoading, login: loginUser } = useAuth();
 
    const testLogin = async () => {
       try {
          console.log("Test de connexion...");
-         const result = await login("test@example.com", "password123");
-         console.log("Résultat:", result);
+         const supabase = createClient();
+         const { data, error } = await supabase.auth.signInWithPassword({
+            email: "test@example.com",
+            password: "password123",
+         });
+         if (error) {
+            console.error("Erreur:", error.message);
+            return;
+         }
+         loginUser(mapSupabaseUser(data.user));
+         console.log("Résultat:", data.user);
       } catch (error) {
          console.error("Erreur de test:", error);
       }
    };
 
-   if (loading) {
+   if (isLoading) {
       return <div>Chargement...</div>;
    }
 

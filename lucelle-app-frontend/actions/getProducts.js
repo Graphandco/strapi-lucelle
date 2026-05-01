@@ -1,5 +1,40 @@
 "use server";
 
+import { getAuthTokenFromCookie } from "@/lib/auth.server";
+
+export async function getProducts(input = {}) {
+   const baseUrl = process.env.PAYLOAD_INTERNAL_URL;
+   if (!baseUrl) {
+      throw new Error("PAYLOAD_INTERNAL_URL is not defined");
+   }
+
+   const token = input.token || (await getAuthTokenFromCookie());
+   if (!token) {
+      throw new Error("Unauthorized: missing auth token");
+   }
+
+   const response = await fetch(
+      `${baseUrl}/api/products?limit=500&depth=1&sort=name`,
+      {
+         method: "GET",
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+         },
+         cache: "no-store",
+      }
+   );
+
+   if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Payload error ${response.status}: ${body}`);
+   }
+
+   const json = await response.json();
+   return json.docs || [];
+}
+"use server";
+
 export async function getStrapiPageBySlug(slug) {
    const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/legals?filters[slug][$eq]=${slug}&populate=*`;
    const res = await fetch(url, { cache: "no-store" }); // SSR

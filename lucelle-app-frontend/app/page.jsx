@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProducts } from "@/contexts/ProductContext";
+import { getSupabaseProducts } from "@/actions/getSupabaseProduct";
 import ProductCard from "@/components/products/ProductCard";
 import Image from "next/image";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -9,12 +11,28 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 export default function Homepage() {
    const { user } = useAuth();
    const { allProducts, loading } = useProducts();
+   const [supabaseProducts, setSupabaseProducts] = useState([]);
+   const [supabaseError, setSupabaseError] = useState(null);
+
+   useEffect(() => {
+      let cancelled = false;
+      getSupabaseProducts()
+         .then((rows) => {
+            if (!cancelled) setSupabaseProducts(rows);
+         })
+         .catch((err) => {
+            if (!cancelled) setSupabaseError(err.message ?? "Erreur Supabase");
+         });
+      return () => {
+         cancelled = true;
+      };
+   }, []);
 
    // Filtrer les produits qui sont à acheter
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    // Filtrer les produits qui ne sont pas dans le panier
    const productsNotInCart = productsToBuy.filter(
-      (product) => !product.isInCart
+      (product) => !product.isInCart,
    );
 
    if (loading) {
@@ -65,6 +83,28 @@ export default function Homepage() {
                   priority
                />
             )}
+            <div className="mt-8 px-3 text-left">
+               <p className="text-primary text-sm font-medium mb-2">
+                  Produits (Supabase)
+               </p>
+               {supabaseError ? (
+                  <p className="text-destructive text-sm">{supabaseError}</p>
+               ) : (
+                  <ul className="text-white text-sm list-disc list-inside space-y-1">
+                     {supabaseProducts.map((row, i) => (
+                        <li key={row.id ?? `${row.name}-${i}`}>
+                           {row.name}
+                           {row.category?.name != null && (
+                              <span className="text-white/60">
+                                 {" "}
+                                 — {row.category.name}
+                              </span>
+                           )}
+                        </li>
+                     ))}
+                  </ul>
+               )}
+            </div>
          </div>
       </ProtectedRoute>
    );

@@ -1,16 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import LoginModal from "./auth/LoginModal";
 
 export default function Header() {
    const { user, isAuthenticated, isLoading } = useAuth();
-   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
    const avatarUrl = user?.avatar?.url
       ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${user.avatar.url}`
@@ -47,9 +44,14 @@ export default function Header() {
                                  </Avatar>
                               </Link>
                            ) : (
-                              <Button onClick={() => setIsLoginModalOpen(true)}>
-                                 Connexion
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                 <Button variant="ghost" asChild className="text-white">
+                                    <Link href="/signup">Inscription</Link>
+                                 </Button>
+                                 <Button asChild>
+                                    <Link href="/login">Connexion</Link>
+                                 </Button>
+                              </div>
                            )}
                         </>
                      )}
@@ -57,11 +59,6 @@ export default function Header() {
                </nav>
             </div>
          </header>
-
-         <LoginModal
-            isOpen={isLoginModalOpen}
-            onClose={() => setIsLoginModalOpen(false)}
-         />
       </>
    );
 }

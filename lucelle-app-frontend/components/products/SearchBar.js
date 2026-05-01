@@ -8,7 +8,7 @@ import Image from "next/image";
 
 export default function SearchBar() {
    const { allProducts, updateProductToBuy } = useProducts();
-   const { user, jwt } = useAuth();
+   const { user } = useAuth();
    const [searchTerm, setSearchTerm] = useState("");
    const [filteredProducts, setFilteredProducts] = useState([]);
 
@@ -42,8 +42,7 @@ export default function SearchBar() {
    }, [searchTerm, allProducts]);
 
    const handleProductClick = async (product) => {
-      if (!jwt) return;
-      await updateProductToBuy(product.documentId, product.isToBuy, jwt);
+      await updateProductToBuy(product.documentId, product.isToBuy);
       setSearchTerm("");
    };
 
@@ -60,8 +59,12 @@ export default function SearchBar() {
             <div className="my-3 rounded-lg px-3 z-10">
                <ul className="py-2 grid grid-cols-4 items-center gap-7">
                   {filteredProducts.map((product) => {
-                     const productImage = product.image?.formats?.thumbnail?.url
-                        ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${product.image.formats.thumbnail.url}`
+                     const rawThumbnail = product.image?.formats?.thumbnail?.url;
+                     const productImage = rawThumbnail
+                        ? rawThumbnail.startsWith("http://") ||
+                          rawThumbnail.startsWith("https://")
+                           ? rawThumbnail
+                           : `${process.env.NEXT_PUBLIC_STRAPI_URL}${rawThumbnail}`
                         : null;
 
                      return (

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { deleteCourse as deleteCourseAction } from "../actions/deleteCourse";
+import { deleteExercice as deleteExerciceAction } from "../actions/deleteExercice";
 
 const ExerciceContext = createContext();
 
@@ -24,7 +25,7 @@ export function ExerciceProvider({ children }) {
             `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exercices?populate=*&pagination[limit]=500`,
             {
                cache: "no-store",
-            }
+            },
          );
 
          if (!response.ok) {
@@ -52,12 +53,12 @@ export function ExerciceProvider({ children }) {
             `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exercice-types?populate=*&pagination[limit]=500`,
             {
                cache: "no-store",
-            }
+            },
          );
 
          if (!response.ok) {
             throw new Error(
-               "Erreur lors de la récupération des types d'exercices"
+               "Erreur lors de la récupération des types d'exercices",
             );
          }
 
@@ -66,7 +67,7 @@ export function ExerciceProvider({ children }) {
 
          // Trier les types d'exercices par nom
          const sortedData = data.sort((a, b) =>
-            a.name.localeCompare(b.name, "fr", { sensitivity: "base" })
+            a.name.localeCompare(b.name, "fr", { sensitivity: "base" }),
          );
          setExerciceTypes(sortedData);
       } catch (error) {
@@ -82,7 +83,7 @@ export function ExerciceProvider({ children }) {
             }/api/courses?populate=*&pagination[limit]=500&_t=${Date.now()}`,
             {
                cache: "no-store",
-            }
+            },
          );
 
          if (!response.ok) {
@@ -92,15 +93,15 @@ export function ExerciceProvider({ children }) {
          const json = await response.json();
          const data = json.data || [];
 
-         console.log("[loadAllCourses] Courses chargées:", data.length);
-         console.log(
-            "[loadAllCourses] IDs:",
-            data.map((course) => course.id)
-         );
+         //  console.log("[loadAllCourses] Courses chargées:", data.length);
+         //  console.log(
+         //     "[loadAllCourses] IDs:",
+         //     data.map((course) => course.id)
+         //  );
 
          // Trier les courses par date (plus récent en premier)
          const sortedData = data.sort(
-            (a, b) => new Date(b.date) - new Date(a.date)
+            (a, b) => new Date(b.date) - new Date(a.date),
          );
          setAllCourses(sortedData);
       } catch (error) {
@@ -108,29 +109,18 @@ export function ExerciceProvider({ children }) {
       }
    };
 
-   const deleteExercice = async (exerciceId, token) => {
+   const deleteExercice = async (exerciceId) => {
       try {
          // Mise à jour optimiste de l'UI
          setAllExercices((prevExercices) =>
-            prevExercices.filter((exercice) => exercice.id !== exerciceId)
+            prevExercices.filter((exercice) => exercice.id !== exerciceId),
          );
 
-         // Suppression dans Strapi
-         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/exercices/${exerciceId}`,
-            {
-               method: "DELETE",
-               headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-               },
-            }
-         );
-
-         if (!response.ok) {
+         const result = await deleteExerciceAction(exerciceId);
+         if (!result?.success) {
             // En cas d'erreur, on revient à l'état précédent
             await loadAllExercices();
-            throw new Error("Failed to delete exercice");
+            throw new Error(result?.error || "Failed to delete exercice");
          }
       } catch (error) {
          console.error("Error deleting exercice:", error);
@@ -138,15 +128,15 @@ export function ExerciceProvider({ children }) {
       }
    };
 
-   const deleteCourse = async (courseId, token) => {
+   const deleteCourse = async (courseId) => {
       try {
          // Mise à jour optimiste de l'UI
          setAllCourses((prevCourses) =>
-            prevCourses.filter((course) => course.id !== courseId)
+            prevCourses.filter((course) => course.id !== courseId),
          );
 
          // Utilisation de l'action deleteCourse
-         const result = await deleteCourseAction(courseId, token);
+         const result = await deleteCourseAction(courseId);
 
          if (!result.success) {
             // En cas d'erreur, on revient à l'état précédent
