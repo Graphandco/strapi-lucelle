@@ -9,6 +9,7 @@ import {
    Home,
    Weight,
    BicepsFlexed,
+   Heart,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -36,19 +37,25 @@ export default function Footer() {
          icon: Store,
          isActive: pathname === "/inventaire",
       },
+      {
+         href: "/my-products",
+         label: "Mes produits",
+         icon: Heart,
+         isActive: pathname === "/my-products",
+      },
       //   {
       //      href: "/fitness",
       //      label: "Fitness",
       //      icon: BicepsFlexed,
       //      isActive: pathname === "/fitness" || pathname.startsWith("/fitness/"),
       //   },
-      {
-         href: "/suivi-poids",
-         label: "Poids",
-         icon: Weight,
-         isActive: pathname === "/suivi-poids",
-         isLast: true,
-      },
+      //   {
+      //      href: "/suivi-poids",
+      //      label: "Poids",
+      //      icon: Weight,
+      //      isActive: pathname === "/suivi-poids",
+      //      isLast: true,
+      //   },
    ];
 
    return (

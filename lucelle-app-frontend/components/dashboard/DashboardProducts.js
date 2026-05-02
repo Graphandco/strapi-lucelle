@@ -50,33 +50,33 @@ export default function DashboardProducts() {
             productsToBuy={productsToBuy}
             productsInCart={productsInCart}
          />
-         <div className="bg-card rounded-lg mt-10 p-3 w-full space-y-3">
-            {categories.map((category) => {
-               const productsInCategory = allProducts.filter(
-                  (product) => product.category?.id === category.id,
-               );
+         {isAdmin && (
+            <div className="bg-card rounded-lg mt-10 p-3 w-full space-y-3">
+               {categories.map((category) => {
+                  const productsInCategory = allProducts.filter(
+                     (product) => product.category?.id === category.id,
+                  );
 
-               if (productsInCategory.length === 0) return null;
+                  if (productsInCategory.length === 0) return null;
 
-               return (
-                  <div key={category.id} className="mb-6">
-                     <h3 className="text-lg text-white font-medium mb-2">
-                        {category.name}{" "}
-                        <span className="text-primary/50 text-base">
-                           ({productsInCategory.length})
-                        </span>
-                     </h3>
-                     <ul className="bg-card rounded-lg px-3 pb-2 space-y-1">
-                        {productsInCategory.map((product) => (
-                           <div
-                              key={product.documentId}
-                              className="flex items-center justify-between pb-1 not-last:border-b border-white/10"
-                           >
-                              <p className="font-light text-sm">
-                                 {product.name}
-                              </p>
+                  return (
+                     <div key={category.id} className="mb-6">
+                        <h3 className="text-lg text-white font-medium mb-2">
+                           {category.name}{" "}
+                           <span className="text-primary/50 text-base">
+                              ({productsInCategory.length})
+                           </span>
+                        </h3>
+                        <ul className="bg-card rounded-lg px-3 pb-2 space-y-1">
+                           {productsInCategory.map((product) => (
+                              <div
+                                 key={product.documentId}
+                                 className="flex items-center justify-between pb-1 not-last:border-b border-white/10"
+                              >
+                                 <p className="font-light text-sm">
+                                    {product.name}
+                                 </p>
 
-                              {isAdmin && (
                                  <ConfirmAlert
                                     title={`Supprimer le produit ${product.name} ?`}
                                     description="Cette action est irréversible."
@@ -90,14 +90,14 @@ export default function DashboardProducts() {
                                        className="text-red-400 cursor-pointer hover:text-red-300 transition-colors"
                                     />
                                  </ConfirmAlert>
-                              )}
-                           </div>
-                        ))}
-                     </ul>
-                  </div>
-               );
-            })}
-         </div>
+                              </div>
+                           ))}
+                        </ul>
+                     </div>
+                  );
+               })}
+            </div>
+         )}
       </>
    );
 }
