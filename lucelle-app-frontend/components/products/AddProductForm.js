@@ -1,17 +1,72 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { addProduct } from "@/actions/addProduct";
 import { getSupabaseCategories } from "@/actions/getSupabaseProduct";
 import { toast } from "sonner";
+import { Upload, X } from "lucide-react";
+
+const ACCEPT_ATTR = "image/jpeg,image/png,image/gif,image/webp,image/avif";
+const ACCEPT_TYPES = new Set([
+   "image/jpeg",
+   "image/png",
+   "image/gif",
+   "image/webp",
+   "image/avif",
+]);
+
+function isAcceptedImage(file) {
+   return file && ACCEPT_TYPES.has(file.type);
+}
 
 export default function AddProductForm() {
    const formRef = useRef(null);
    const nameInputRef = useRef(null);
    const imageInputRef = useRef(null);
+   const dragCounter = useRef(0);
+
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
    const [categories, setCategories] = useState([]);
+   const [dragActive, setDragActive] = useState(false);
+   const [previewUrl, setPreviewUrl] = useState(null);
+   const [imageName, setImageName] = useState(null);
+
+   const clearImage = useCallback(() => {
+      setPreviewUrl(null);
+      setImageName(null);
+      const input = imageInputRef.current;
+      if (input) input.value = "";
+   }, []);
+
+   const assignFile = useCallback(
+      (file) => {
+         if (!file) return;
+         if (!isAcceptedImage(file)) {
+            toast.error(
+               "Format non pris en charge (JPEG, PNG, GIF, WebP ou AVIF).",
+            );
+            return;
+         }
+         const input = imageInputRef.current;
+         if (!input) return;
+
+         clearImage();
+         const dt = new DataTransfer();
+         dt.items.add(file);
+         input.files = dt.files;
+
+         setPreviewUrl(URL.createObjectURL(file));
+         setImageName(file.name);
+      },
+      [clearImage],
+   );
+
+   useEffect(() => {
+      return () => {
+         if (previewUrl) URL.revokeObjectURL(previewUrl);
+      };
+   }, [previewUrl]);
 
    useEffect(() => {
       let cancelled = false;
@@ -31,6 +86,46 @@ export default function AddProductForm() {
          cancelled = true;
       };
    }, []);
+
+   const handleImageInputChange = (e) => {
+      const file = e.target.files?.[0];
+      if (file) assignFile(file);
+   };
+
+   const handleDragEnter = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current += 1;
+      setDragActive(true);
+   };
+
+   const handleDragLeave = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current -= 1;
+      if (dragCounter.current <= 0) {
+         dragCounter.current = 0;
+         setDragActive(false);
+      }
+   };
+
+   const handleDragOver = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+   };
+
+   const handleDrop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounter.current = 0;
+      setDragActive(false);
+      const file = e.dataTransfer.files?.[0];
+      if (file) assignFile(file);
+   };
+
+   const openFilePicker = () => {
+      imageInputRef.current?.click();
+   };
 
    async function handleSubmit(event) {
       event.preventDefault();
@@ -54,15 +149,11 @@ export default function AddProductForm() {
          if (nameInputRef.current) {
             nameInputRef.current.value = "";
          }
-         if (imageInputRef.current) {
-            imageInputRef.current.value = "";
-         }
+         clearImage();
          toast.success("Produit ajouté avec succès");
-
-         //router.push("/shopping-list");
-      } catch (error) {
-         console.error("Erreur détaillée:", error);
-         setError(error.message);
+      } catch (err) {
+         console.error("Erreur détaillée:", err);
+         setError(err.message);
       } finally {
          setLoading(false);
       }
@@ -72,7 +163,7 @@ export default function AddProductForm() {
       <form
          ref={formRef}
          onSubmit={handleSubmit}
-         className="max-w-md space-y-4"
+         className="max-w-2xl w-full space-y-6"
       >
          <div>
             <input
@@ -83,23 +174,6 @@ export default function AddProductForm() {
                required
                placeholder="Nom du produit"
                className="bg-card outline-none border-none rounded-lg w-full p-4 placeholder:text-white placeholder:text-sm"
-            />
-         </div>
-
-         <div>
-            <label
-               htmlFor="image"
-               className="block text-white/70 text-sm mb-2"
-            >
-               Photo (optionnel)
-            </label>
-            <input
-               ref={imageInputRef}
-               id="image"
-               name="image"
-               type="file"
-               accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
-               className="block w-full text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-black file:font-normal"
             />
          </div>
 
@@ -125,7 +199,84 @@ export default function AddProductForm() {
             </select>
          </div>
 
-         {error && <div className="text-red-500 text-sm">{error}</div>}
+         <div className="space-y-2">
+            <span className="block text-white/70 text-sm">
+               Image (facultatif)
+            </span>
+            <input
+               ref={imageInputRef}
+               id="image"
+               name="image"
+               type="file"
+               accept={ACCEPT_ATTR}
+               className="sr-only"
+               onChange={handleImageInputChange}
+            />
+            <button
+               type="button"
+               onClick={openFilePicker}
+               onDragEnter={handleDragEnter}
+               onDragLeave={handleDragLeave}
+               onDragOver={handleDragOver}
+               onDrop={handleDrop}
+               className={[
+                  "relative w-full min-h-[220px] rounded-xl border-2 border-dashed transition-colors",
+                  "flex flex-col items-center justify-center gap-3 px-6 py-8 text-center cursor-pointer",
+                  "outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  dragActive
+                     ? "border-primary bg-primary/10 text-white"
+                     : "border-white/25 bg-card/50 text-white/60 hover:border-primary/50 hover:bg-card hover:text-white/80",
+               ].join(" ")}
+            >
+               {previewUrl ? (
+                  <>
+                     <img
+                        src={previewUrl}
+                        alt=""
+                        className="max-h-28 w-auto max-w-full rounded-lg object-contain shadow-md"
+                     />
+                     <span className="text-sm text-white/80 truncate max-w-full px-2">
+                        {imageName}
+                     </span>
+                     <span className="text-xs text-white/50">
+                        Glisser une autre image ou cliquer pour remplacer
+                     </span>
+                  </>
+               ) : (
+                  <>
+                     <Upload
+                        className="size-8 text-white/40 shrink-0"
+                        strokeWidth={1.25}
+                        aria-hidden
+                     />
+                     <span className="text-base text-white/85 font-medium">
+                        Glisser-déposer une image ici
+                     </span>
+                     <span className="text-sm text-white/50">
+                        ou cliquer pour parcourir les fichiers
+                     </span>
+                     <span className="text-xs text-white/40">
+                        JPEG, PNG, GIF, WebP ou AVIF
+                     </span>
+                  </>
+               )}
+            </button>
+            {previewUrl ? (
+               <button
+                  type="button"
+                  onClick={(e) => {
+                     e.stopPropagation();
+                     clearImage();
+                  }}
+                  className="inline-flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300"
+               >
+                  <X size={16} aria-hidden />
+                  Retirer l’image
+               </button>
+            ) : null}
+         </div>
+
+         {error ? <div className="text-red-500 text-sm">{error}</div> : null}
 
          <button
             type="submit"

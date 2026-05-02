@@ -36,12 +36,12 @@ export default function Footer() {
          icon: Store,
          isActive: pathname === "/inventaire",
       },
-      {
-         href: "/fitness",
-         label: "Fitness",
-         icon: BicepsFlexed,
-         isActive: pathname === "/fitness" || pathname.startsWith("/fitness/"),
-      },
+      //   {
+      //      href: "/fitness",
+      //      label: "Fitness",
+      //      icon: BicepsFlexed,
+      //      isActive: pathname === "/fitness" || pathname.startsWith("/fitness/"),
+      //   },
       {
          href: "/suivi-poids",
          label: "Poids",
@@ -53,7 +53,7 @@ export default function Footer() {
 
    return (
       <footer className="fixed z-10 bottom-0 left-0 w-full bg-card border-t border-white/10">
-         <div className="mx-auto grid grid-cols-5 items-center justify-center">
+         <div className="mx-auto grid grid-cols-4 items-center justify-center">
             {links.map((link, index) => {
                const IconComponent = link.icon;
                return (
@@ -62,10 +62,10 @@ export default function Footer() {
                      href={link.href}
                      className={`flex flex-col items-center mx-2 pt-3 pb-2 
                         ${!link.isLast ? "" : ""} ${
-                        link.isActive
-                           ? "text-white border-t border-white"
-                           : "text-white/30 "
-                     }`}
+                           link.isActive
+                              ? "text-white border-t border-white"
+                              : "text-white/30 "
+                        }`}
                   >
                      <IconComponent size={22} />
                      <span className="text-[12px]">{link.label}</span>

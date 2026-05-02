@@ -9,8 +9,12 @@ import { useCallback } from "react";
 
 export default function Homepage() {
    const { user } = useAuth();
-   const { products: allProducts, loading, reload, patchProduct } =
-      useCatalogData();
+   const {
+      products: allProducts,
+      loading,
+      reload,
+      patchProduct,
+   } = useCatalogData();
 
    const reconcile = useCallback(() => reload({ silent: true }), [reload]);
 
@@ -43,9 +47,19 @@ export default function Homepage() {
                   Bienvenue {user?.username} !
                </div>
                <div className="text-white text-sm">
-                  {hasItems
-                     ? `Encore à prendre / mettre au panier (${productsToBuyNotInCart.length}) — touchez quand c’est fait`
-                     : "Tout est au panier ou rien à acheter pour l’instant"}
+                  {hasItems ? (
+                     <div className="flex items-center justify-center gap-2">
+                        <span className="text-primary text-2xl inline-block">
+                           {productsToBuyNotInCart.length}
+                        </span>
+                        <span className="">
+                           produit{productsToBuyNotInCart.length > 1 ? "s" : ""}{" "}
+                           dans la liste de courses
+                        </span>
+                     </div>
+                  ) : (
+                     "Rien à acheter pour l’instant, ajoutez des produits à votre liste !"
+                  )}
                </div>
             </div>
             {hasItems ? (
