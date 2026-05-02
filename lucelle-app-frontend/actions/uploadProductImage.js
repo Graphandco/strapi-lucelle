@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { randomUUID } from "crypto";
 
 const BUCKET = "shopping_list";
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -29,6 +28,37 @@ function extensionFromMime(type, fallbackName) {
       return ext === "jpeg" ? "jpg" : ext;
    }
    return "jpg";
+}
+
+/** Nom de fichier sans extension (dernier segment de chemin). */
+function baseNameWithoutExt(name) {
+   const base = String(name || "").replace(/^.*[/\\]/, "");
+   const i = base.lastIndexOf(".");
+   return i > 0 ? base.slice(0, i) : base || "image";
+}
+
+/**
+ * Base sûre pour une clé Storage : ASCII, pas de slash, longueur bornée.
+ * @param {string} raw
+ * @param {number} [maxLen]
+ */
+function sanitizeStorageBase(raw, maxLen = 80) {
+   let s = baseNameWithoutExt(raw)
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, maxLen);
+   if (!s) s = "image";
+   return s;
+}
+
+/** Date au format jour-mois-année (JJ-MM-AAAA), calendrier local du serveur. */
+function formatDateDmy(d = new Date()) {
+   const y = d.getFullYear();
+   const m = String(d.getMonth() + 1).padStart(2, "0");
+   const day = String(d.getDate()).padStart(2, "0");
+   return `${day}-${m}-${y}`;
 }
 
 /**
@@ -69,7 +99,8 @@ export async function uploadProductImageFile(file) {
       }
 
       const ext = extensionFromMime(file.type, file.name);
-      const path = `${user.id}/${Date.now()}-${randomUUID()}.${ext}`;
+      const base = sanitizeStorageBase(file.name);
+      const path = `${base}-${formatDateDmy()}-${user.id}.${ext}`;
       const buffer = Buffer.from(await file.arrayBuffer());
 
       const { error: upErr } = await supabase.storage
