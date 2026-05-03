@@ -38,12 +38,14 @@ export default function LoginPageForm() {
             });
 
          if (signInError) {
+            console.error("[LoginPageForm] signInWithPassword:", signInError);
             setError(signInError.message || "Identifiants invalides");
             toast.error("Erreur de connexion");
             return;
          }
 
          if (!data.user) {
+            console.error("[LoginPageForm] signInWithPassword: pas d'utilisateur", data);
             setError("Connexion impossible");
             toast.error("Erreur de connexion");
             return;
@@ -54,7 +56,12 @@ export default function LoginPageForm() {
          router.refresh();
          router.replace(nextPath);
       } catch (err) {
-         setError("Une erreur est survenue lors de la connexion");
+         console.error("[LoginPageForm]", err);
+         setError(
+            err instanceof Error
+               ? err.message
+               : "Une erreur est survenue lors de la connexion",
+         );
          toast.error("Erreur de connexion");
       } finally {
          setIsLoading(false);

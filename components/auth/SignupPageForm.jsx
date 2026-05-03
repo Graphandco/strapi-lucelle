@@ -45,6 +45,7 @@ export default function SignupPageForm() {
          });
 
          if (signUpError) {
+            console.error("[SignupPageForm] signUp:", signUpError);
             setError(signUpError.message || "Inscription impossible");
             toast.error("Erreur d'inscription");
             return;
@@ -66,10 +67,16 @@ export default function SignupPageForm() {
             return;
          }
 
+         console.error("[SignupPageForm] réponse signUp inattendue:", data);
          setError("Inscription impossible");
          toast.error("Erreur d'inscription");
       } catch (err) {
-         setError("Une erreur est survenue lors de l'inscription");
+         console.error("[SignupPageForm]", err);
+         setError(
+            err instanceof Error
+               ? err.message
+               : "Une erreur est survenue lors de l'inscription",
+         );
          toast.error("Erreur d'inscription");
       } finally {
          setIsLoading(false);

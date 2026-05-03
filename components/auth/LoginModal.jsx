@@ -33,12 +33,14 @@ export default function LoginModal({ isOpen, onClose }) {
             });
 
          if (signInError) {
+            console.error("[LoginModal] signInWithPassword:", signInError);
             setError(signInError.message);
             toast.error("Erreur de connexion");
             return;
          }
 
          if (!data.user) {
+            console.error("[LoginModal] signInWithPassword: pas d'utilisateur", data);
             setError("Connexion impossible");
             toast.error("Erreur de connexion");
             return;
@@ -48,7 +50,12 @@ export default function LoginModal({ isOpen, onClose }) {
          toast.success("Connexion réussie !");
          onClose();
       } catch (err) {
-         setError("Une erreur est survenue lors de la connexion");
+         console.error("[LoginModal]", err);
+         setError(
+            err instanceof Error
+               ? err.message
+               : "Une erreur est survenue lors de la connexion",
+         );
          toast.error("Erreur de connexion");
       } finally {
          setIsLoading(false);
