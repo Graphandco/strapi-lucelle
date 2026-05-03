@@ -139,3 +139,9 @@ build
 .next
 /.next/
 /out/
+
+############################
+# Docker
+############################
+docker-compose.override.yml
+Dockerfile.dev

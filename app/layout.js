@@ -6,7 +6,6 @@ import { WeightProvider } from "@/contexts/WeightContext";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
-import { ExerciceProvider } from "@/contexts/ExerciceContext";
 
 const inter = Inter({ subsets: ["latin"] });
 const jost = Jost({
@@ -35,14 +34,12 @@ export default function RootLayout({ children }) {
          >
             <AuthProvider>
                <WeightProvider>
-                  <ExerciceProvider>
-                     <Header />
-                     <main className="grow container flex flex-col justify-between pt-6">
-                        {children}
-                     </main>
-                     <Footer />
-                     <Toaster position="top-center" />
-                  </ExerciceProvider>
+                  <Header />
+                  <main className="grow container flex flex-col justify-between pt-6">
+                     {children}
+                  </main>
+                  <Footer />
+                  <Toaster position="top-center" />
                </WeightProvider>
             </AuthProvider>
          </body>
