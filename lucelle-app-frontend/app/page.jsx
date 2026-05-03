@@ -76,11 +76,11 @@ export default function Homepage() {
                </ul>
             ) : (
                <Image
-                  src="/empty-cart.png"
+                  src="/badger.png"
                   alt="Caddie vide"
-                  width={300}
-                  height={300}
-                  className="mx-auto mt-10"
+                  width={1289}
+                  height={2219}
+                  className="mx-auto mt-10 max-w-44"
                   priority
                />
             )}

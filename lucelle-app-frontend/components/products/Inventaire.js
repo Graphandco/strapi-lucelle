@@ -7,8 +7,13 @@ import { PlusCircle } from "lucide-react";
 import { useCallback } from "react";
 
 export default function Inventaire() {
-   const { products: allProducts, categories, loading, reload, patchProduct } =
-      useCatalogData();
+   const {
+      products: allProducts,
+      categories,
+      loading,
+      reload,
+      patchProduct,
+   } = useCatalogData();
 
    const reconcile = useCallback(() => reload({ silent: true }), [reload]);
 
@@ -19,7 +24,7 @@ export default function Inventaire() {
    return (
       <div>
          <div className="flex justify-between items-center">
-            <h1 className="text-2xl mb-3 px-1 text-primary flex items-center gap-2">
+            <h1 className="text-lg mb-3 px-1 text-primary flex items-center gap-2">
                Inventaire
                <span className="text-base text-white mt-1">
                   ({allProducts.length})
@@ -44,7 +49,7 @@ export default function Inventaire() {
                   <h3 className="text-lg text-white font-medium mb-2">
                      {category.name}
                   </h3>
-                  <ul className="bg-card rounded-lg px-3 pb-2">
+                  <ul className="rounded-lg px-3 pb-2">
                      {productsInCategory.map((product) => (
                         <ProductCard
                            key={product.documentId}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { addProduct } from "@/actions/addProduct";
 import { getSupabaseCategories } from "@/actions/getSupabaseProduct";
+import { getMyProfileRole } from "@/actions/getMyProfileRole";
 import { toast } from "sonner";
 import { Upload, X } from "lucide-react";
 
@@ -31,6 +32,7 @@ export default function AddProductForm() {
    const [dragActive, setDragActive] = useState(false);
    const [previewUrl, setPreviewUrl] = useState(null);
    const [imageName, setImageName] = useState(null);
+   const [isAdmin, setIsAdmin] = useState(false);
 
    const clearImage = useCallback(() => {
       setPreviewUrl(null);
@@ -72,11 +74,15 @@ export default function AddProductForm() {
       let cancelled = false;
       (async () => {
          try {
-            const data = await getSupabaseCategories();
+            const [data, { role }] = await Promise.all([
+               getSupabaseCategories(),
+               getMyProfileRole(),
+            ]);
             if (!cancelled) {
                setCategories(
                   [...(data ?? [])].map((c) => ({ ...c, id: String(c.id) })),
                );
+               setIsAdmin(role === "admin");
             }
          } catch (e) {
             console.error(e);
@@ -198,6 +204,25 @@ export default function AddProductForm() {
                ))}
             </select>
          </div>
+
+         {isAdmin ? (
+            <div className="flex flex-col gap-1.5 rounded-lg bg-card/60 px-4 py-3">
+               <label className="flex cursor-pointer items-center gap-3 text-sm text-white">
+                  <input
+                     type="checkbox"
+                     name="personal_product"
+                     value="on"
+                     defaultChecked
+                     className="size-4 shrink-0 rounded border-white/30 bg-card accent-primary"
+                  />
+                  <span>Produit perso</span>
+               </label>
+               <p className="text-xs text-white/50 pl-7">
+                  Coché : visible pour toi uniquement. Décoché : produit catalogue
+                  (tout le monde).
+               </p>
+            </div>
+         ) : null}
 
          <div className="space-y-2">
             <span className="block text-white/70 text-sm">

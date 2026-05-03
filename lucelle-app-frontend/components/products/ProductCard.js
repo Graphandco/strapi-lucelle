@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MinusCircle, PlusCircle, Heart } from "lucide-react";
+import { MinusCircle, PlusCircle, Heart, Trash } from "lucide-react";
+import { toast } from "sonner";
 import {
    addToBuy,
    removeToBuy,
@@ -11,13 +13,16 @@ import {
    updateToBuyQuantity,
 } from "@/actions/status";
 import { setFavorite } from "@/actions/favorites";
+import { deleteProduct } from "@/actions/deleteProduct";
 
 const ProductCard = ({
    product,
    pageType,
    patchProduct,
    reconcile,
+   showOwnerDelete = false,
 }) => {
+   const [deleting, setDeleting] = useState(false);
    const rawThumbnail = product.image?.formats?.thumbnail?.url;
    const strapiOrRelative = rawThumbnail
       ? rawThumbnail.startsWith("http://") ||
@@ -43,6 +48,28 @@ const ProductCard = ({
       } catch (error) {
          console.error("Erreur lors de la mise à jour de la quantité:", error);
          await reconcile?.();
+      }
+   };
+
+   const handleDeleteOwnProduct = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (deleting) return;
+      setDeleting(true);
+      try {
+         const r = await deleteProduct(product.documentId);
+         if (!r?.success) {
+            toast.error(r?.error || "Suppression impossible.");
+            return;
+         }
+         toast.success("Produit supprimé.");
+         await reconcile?.();
+      } catch (err) {
+         console.error(err);
+         toast.error(err?.message || "Erreur lors de la suppression.");
+         await reconcile?.();
+      } finally {
+         setDeleting(false);
       }
    };
 
@@ -76,7 +103,7 @@ const ProductCard = ({
                   ease: "easeOut",
                },
             }}
-            className={`bg-card flex items-center justify-between py-3 px-1 cursor-pointer not-last:border-b border-white/10 ${
+            className={`flex items-center justify-between py-3 px-1 cursor-pointer not-last:border-b border-white/10 ${
                isToBuy ? "opacity-20! " : "opacity-100"
             }`}
             onClick={async () => {
@@ -127,7 +154,7 @@ const ProductCard = ({
             </div>
             {pageType === "inventaire" && (
                <div
-                  className="flex items-center relative z-10"
+                  className="flex items-center gap-0.5 relative z-10"
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => e.stopPropagation()}
                >
@@ -150,6 +177,21 @@ const ProductCard = ({
                         }
                      />
                   </button>
+                  {showOwnerDelete ? (
+                     <button
+                        type="button"
+                        onClick={handleDeleteOwnProduct}
+                        disabled={deleting}
+                        className="p-1.5 rounded-full hover:bg-red-500/15 transition-colors disabled:opacity-40"
+                        aria-label="Supprimer ce produit"
+                     >
+                        <Trash
+                           size={18}
+                           className="text-red-400/90"
+                           aria-hidden
+                        />
+                     </button>
+                  ) : null}
                </div>
             )}
             {showQuantity && (

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
    getSupabaseProducts,
+   getSupabaseMyProducts,
    getSupabaseCategories,
 } from "@/actions/getSupabaseProduct";
 import {
@@ -11,45 +12,15 @@ import {
    listInCartProductIds,
 } from "@/actions/status";
 import { getFavoriteProductIds } from "@/actions/favorites";
+import { mapCatalogRow, pidKey } from "@/lib/catalogMap";
 
-function pidKey(id) {
-   return id == null ? "" : String(id);
-}
-
-function mapRow(row, toBuyQuantityByProductId, inCartIds, favoriteIds) {
-   const id = row.id;
-   const key = pidKey(id);
-   const category = row.category
-      ? {
-           id: String(row.category.id ?? row.category_id),
-           name: row.category.name,
-        }
-      : row.category_id != null
-        ? { id: String(row.category_id), name: "—" }
-        : null;
-
-   const isToBuy = toBuyQuantityByProductId.has(key);
-   const quantity = isToBuy
-      ? Math.max(1, Number(toBuyQuantityByProductId.get(key)) || 1)
-      : Math.max(1, Number(row.quantity) || 1);
-
-   return {
-      id,
-      documentId: key,
-      name: row.name,
-      isToBuy,
-      isInCart: inCartIds.has(key),
-      category,
-      quantity,
-      /** Quantité catalogue (table `products`), utile quand `isToBuy` est faux. */
-      catalogBaseQuantity: Math.max(1, Number(row.quantity) || 1),
-      imageUrl: row.image_url ?? null,
-      image: null,
-      isFavorited: favoriteIds.has(key),
-   };
-}
-
-export function useCatalogData() {
+/**
+ * @param {{ mode?: "catalog" | "mine" }} options
+ * - `catalog` (défaut) : publics + perso de l’utilisateur.
+ * - `mine` : uniquement les produits dont `user_id` = utilisateur connecté.
+ */
+export function useCatalogData(options = {}) {
+   const mode = options.mode === "mine" ? "mine" : "catalog";
    const { user } = useAuth();
    const [products, setProducts] = useState([]);
    const [categories, setCategories] = useState([]);
@@ -64,9 +35,12 @@ export function useCatalogData() {
          setLoading(true);
       }
       try {
+         const fetchProducts =
+            mode === "mine" ? getSupabaseMyProducts : getSupabaseProducts;
+
          const [rows, cats, toBuyRows, inCartRaw, favoriteRaw] =
             await Promise.all([
-               getSupabaseProducts(),
+               fetchProducts(),
                getSupabaseCategories(),
                listToBuyStatus(),
                listInCartProductIds(),
@@ -84,7 +58,7 @@ export function useCatalogData() {
          );
          const mapped = (rows ?? [])
             .map((row) =>
-               mapRow(
+               mapCatalogRow(
                   row,
                   toBuyQuantityByProductId,
                   inCartIds,
@@ -109,7 +83,7 @@ export function useCatalogData() {
             setLoading(false);
          }
       }
-   }, []);
+   }, [mode]);
 
    useEffect(() => {
       reload();

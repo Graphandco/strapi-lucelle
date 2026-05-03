@@ -11,6 +11,7 @@ import {
    BicepsFlexed,
    Heart,
 } from "lucide-react";
+import { BsBox2HeartFill, BsShopWindow, BsHouse, BsCart } from "react-icons/bs";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
@@ -22,25 +23,25 @@ export default function Footer() {
       {
          href: "/",
          label: "Accueil",
-         icon: Home,
+         icon: BsHouse,
          isActive: pathname === "/",
       },
       {
          href: "/shopping-list",
          label: "Panier",
-         icon: ShoppingCart,
+         icon: BsCart,
          isActive: pathname === "/shopping-list",
       },
       {
          href: "/inventaire",
          label: "Inventaire",
-         icon: Store,
+         icon: BsShopWindow,
          isActive: pathname === "/inventaire",
       },
       {
          href: "/my-products",
          label: "Mes produits",
-         icon: Heart,
+         icon: BsBox2HeartFill,
          isActive: pathname === "/my-products",
       },
       //   {

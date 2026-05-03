@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getMyProfileRole } from "@/actions/getMyProfileRole";
 import { shoppingListObjectPathFromImageUrl } from "@/lib/shoppingListStoragePath";
 
 const SCHEMA = "shopping_list";
@@ -26,7 +27,7 @@ export async function deleteProduct(documentId) {
       const { data: row, error: fetchError } = await supabase
          .schema(SCHEMA)
          .from("products")
-         .select("image_url")
+         .select("image_url, user_id")
          .eq("id", id)
          .maybeSingle();
 
@@ -37,6 +38,28 @@ export async function deleteProduct(documentId) {
 
       if (!row) {
          return { success: false, error: "Produit introuvable." };
+      }
+
+      const { role } = await getMyProfileRole();
+      const isAdmin = role === "admin";
+      const ownerId =
+         row.user_id != null && String(row.user_id).trim() !== ""
+            ? String(row.user_id)
+            : null;
+      const isOwner = ownerId != null && ownerId === String(user.id);
+      const isCatalog = ownerId == null;
+
+      if (isCatalog && !isAdmin) {
+         return {
+            success: false,
+            error: "Seul un administrateur peut supprimer un produit catalogue.",
+         };
+      }
+      if (!isCatalog && !isOwner && !isAdmin) {
+         return {
+            success: false,
+            error: "Tu ne peux pas supprimer ce produit.",
+         };
       }
 
       const { error } = await supabase

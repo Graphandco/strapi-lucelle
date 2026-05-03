@@ -2,8 +2,15 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { tryUploadProductImageField } from "@/actions/uploadProductImage";
+import { getMyProfileRole } from "@/actions/getMyProfileRole";
 
 const SCHEMA = "shopping_list";
+
+/** Case « produit perso » (admin) : présente = perso (`user_id` renseigné). */
+function formWantsPersonalProduct(formData) {
+   const v = formData.get("personal_product");
+   return v === "on" || v === "true" || v === true;
+}
 
 export async function addProduct(formData) {
    const nameRaw = formData.get("name");
@@ -36,6 +43,14 @@ export async function addProduct(formData) {
          };
       }
 
+      const { role } = await getMyProfileRole();
+      const isAdmin = role === "admin";
+      const wantsPersonal = formWantsPersonalProduct(formData);
+
+      /** Non-admin : toujours perso. Admin : catalogue si case décochée. */
+      const userIdForRow =
+         isAdmin && !wantsPersonal ? null : user.id;
+
       const imageField = formData.get("image");
       const uploadResult = await tryUploadProductImageField(imageField);
       if (!uploadResult.success) {
@@ -45,12 +60,16 @@ export async function addProduct(formData) {
       const row = {
          name,
          category_id: categoryId,
+         user_id: userIdForRow,
       };
       if (uploadResult.url) {
          row.image_url = uploadResult.url;
       }
 
-      const { error } = await supabase.schema(SCHEMA).from("products").insert(row);
+      const { error } = await supabase
+         .schema(SCHEMA)
+         .from("products")
+         .insert(row);
 
       if (error) {
          console.error("addProduct (Supabase):", error.message);

@@ -67,7 +67,7 @@ export default function DashboardProducts() {
                               ({productsInCategory.length})
                            </span>
                         </h3>
-                        <ul className="bg-card rounded-lg px-3 pb-2 space-y-1">
+                        <ul className="rounded-lg px-3 pb-2 space-y-1">
                            {productsInCategory.map((product) => (
                               <div
                                  key={product.documentId}

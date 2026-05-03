@@ -59,7 +59,7 @@ export default function ShoppingList() {
 
    return (
       <div className="">
-         <h1 className="text-2xl mb-3 px-1 text-primary flex items-center gap-2">
+         <h1 className="text-lg mb-3 px-1 text-primary flex items-center gap-2">
             Liste de courses
             <span className="text-base text-white mt-1">
                ({productsNotInCart.length})
@@ -75,19 +75,11 @@ export default function ShoppingList() {
                <p className="text-center text-white">
                   Aucun produit dans la liste !
                </p>
-               <Image
-                  src="/empty-cart.png"
-                  alt="Caddie vide"
-                  width={150}
-                  height={150}
-                  className="mx-auto mt-5"
-                  priority
-               />
             </>
          ) : (
             <div className="grid gap-8">
                {productsNotInCart.length > 0 && (
-                  <div className="bg-card rounded-lg px-3 pb-1">
+                  <div className="rounded-lg px-3 pb-1">
                      {categories.map((category) => {
                         const productsInCategory = productsNotInCart.filter(
                            (product) => product.category?.id === category.id,
@@ -126,7 +118,7 @@ export default function ShoppingList() {
                            </AccordionTrigger>
                            <AccordionContent className="text-center">
                               <>
-                                 <ul className="bg-card rounded-lg px-3 py-2">
+                                 <ul className="rounded-lg px-3 py-2">
                                     {productsInCart.map((product) => (
                                        <ProductCard
                                           key={product.documentId}

@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
             <meta name="theme-color" content="#ffffff" />
          </head>
          <body
-            className={`${jost.variable} flex flex-col justify-between pb-16`}
+            className={`${jost.variable} flex flex-col justify-between pb-16 bg-linear-to-r from-[#171717] to-background`}
          >
             <AuthProvider>
                <WeightProvider>
