@@ -1,9 +1,7 @@
 services:
    app:
-      container_name: lucelle-app-frontend
-      build:
-         context: .
-         dockerfile: Dockerfile
+      container_name: lucelle-app
+      image: ghcr.io/graphandco/lucelle-app-supabase:latest
       restart: unless-stopped
       # ports:
       #    - "3001:3001"
