@@ -5,8 +5,10 @@ services:
       restart: unless-stopped
       # ports:
       #    - "3001:3001"
-      # env_file:
-      #    - .env
+      # Optionnel : surcharge / variables si l’image n’a pas les NEXT_PUBLIC_* au build.
+      env_file:
+         - path: .env
+           required: false
       networks:
          - web-network
 
