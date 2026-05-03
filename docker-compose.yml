@@ -2,6 +2,8 @@ services:
    app:
       container_name: lucelle-app
       image: ghcr.io/graphandco/lucelle-app-supabase:latest
+      # Sans ça, Docker réutilise l’ancienne image locale même si `latest` a été repoussé sur GHCR.
+      pull_policy: always
       restart: unless-stopped
       # ports:
       #    - "3001:3001"
