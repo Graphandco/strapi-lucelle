@@ -14,6 +14,7 @@ import {
 } from "@/actions/status";
 import { setFavorite } from "@/actions/favorites";
 import { deleteProduct } from "@/actions/deleteProduct";
+import { resolveProductImageUrl } from "@/lib/productImageUrl";
 
 const ProductCard = ({
    product,
@@ -23,19 +24,7 @@ const ProductCard = ({
    showOwnerDelete = false,
 }) => {
    const [deleting, setDeleting] = useState(false);
-   const rawThumbnail = product.image?.formats?.thumbnail?.url;
-   const strapiOrRelative = rawThumbnail
-      ? rawThumbnail.startsWith("http://") ||
-        rawThumbnail.startsWith("https://")
-         ? rawThumbnail
-         : `${process.env.NEXT_PUBLIC_STRAPI_URL}${rawThumbnail}`
-      : null;
-   const productImage =
-      product.imageUrl &&
-      (product.imageUrl.startsWith("http://") ||
-         product.imageUrl.startsWith("https://"))
-         ? product.imageUrl
-         : strapiOrRelative;
+   const productImage = resolveProductImageUrl(product);
    const isToBuy = pageType === "inventaire" && product.isToBuy;
    const showQuantity = pageType === "shopping-list";
 

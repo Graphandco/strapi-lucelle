@@ -68,7 +68,7 @@ export default function Footer() {
                   <Link
                      key={link.href}
                      href={link.href}
-                     className={`flex flex-col items-center mx-2 pt-3 pb-2 
+                     className={`flex flex-col items-center mx-2 pt-2 pb-1 
                         ${!link.isLast ? "" : ""} ${
                            link.isActive
                               ? "text-white border-t border-white"

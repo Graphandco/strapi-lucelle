@@ -77,9 +77,9 @@ export default function MyProductsFavorites() {
    }
 
    return (
-      <div className="space-y-6">
+      <div className="space-y-6 mb-6">
          <section>
-            <div className="flex items-center gap-24">
+            <div className="flex items-center gap-16">
                <Image
                   src="/badger-love.svg"
                   alt="Blaireau love"
@@ -109,7 +109,7 @@ export default function MyProductsFavorites() {
             )}
          </section>
          <section>
-            <div className="flex items-center gap-24">
+            <div className="flex items-center gap-16">
                <Image
                   src="/badger-personnal.svg"
                   alt="Blaireau love"

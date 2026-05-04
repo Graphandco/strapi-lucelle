@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { addToBuy } from "@/actions/status";
+import { resolveProductImageUrl } from "@/lib/productImageUrl";
 
 export default function SearchBar({
    allProducts,
@@ -64,19 +65,7 @@ export default function SearchBar({
             <div className="my-3 rounded-lg px-3 z-10">
                <ul className="py-2 grid grid-cols-4 items-center gap-7">
                   {filteredProducts.map((product) => {
-                     const rawThumbnail = product.image?.formats?.thumbnail?.url;
-                     const strapiOrRelative = rawThumbnail
-                        ? rawThumbnail.startsWith("http://") ||
-                          rawThumbnail.startsWith("https://")
-                           ? rawThumbnail
-                           : `${process.env.NEXT_PUBLIC_STRAPI_URL}${rawThumbnail}`
-                        : null;
-                     const productImage =
-                        product.imageUrl &&
-                        (product.imageUrl.startsWith("http://") ||
-                           product.imageUrl.startsWith("https://"))
-                           ? product.imageUrl
-                           : strapiOrRelative;
+                     const productImage = resolveProductImageUrl(product);
 
                      return (
                         <li
