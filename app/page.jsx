@@ -33,7 +33,7 @@ export default function Homepage() {
       <ProtectedRoute>
          <div className="">
             <div className="py-3 space-y-1 text-center">
-               {hasItems && (
+               {/* {hasItems && (
                   <Image
                      src="/full-cart.png"
                      alt="Caddie plein"
@@ -42,7 +42,7 @@ export default function Homepage() {
                      className="mx-auto"
                      priority
                   />
-               )}
+               )} */}
                <div className="text-primary text-lg font-base">
                   Bienvenue {user?.username} !
                </div>
