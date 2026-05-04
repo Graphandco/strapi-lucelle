@@ -2,9 +2,17 @@
 
 import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
-import Link from "next/link";
-import { PlusCircle } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
+
+function normalizeText(text) {
+   return String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+}
 
 export default function Inventaire() {
    const {
@@ -14,8 +22,17 @@ export default function Inventaire() {
       reload,
       patchProduct,
    } = useCatalogData();
+   const [searchTerm, setSearchTerm] = useState("");
 
    const reconcile = useCallback(() => reload({ silent: true }), [reload]);
+
+   const filteredProducts = useMemo(() => {
+      const q = normalizeText(searchTerm);
+      if (!q) return allProducts;
+      return allProducts.filter((product) =>
+         normalizeText(product.name).includes(q),
+      );
+   }, [allProducts, searchTerm]);
 
    if (loading) {
       return <div>Chargement...</div>;
@@ -27,18 +44,35 @@ export default function Inventaire() {
             <h1 className="text-lg mb-3 px-1 text-primary flex items-center gap-2">
                Inventaire
                <span className="text-base text-white mt-1">
-                  ({allProducts.length})
+                  ({filteredProducts.length}
+                  {searchTerm.trim() && allProducts.length !== filteredProducts.length
+                     ? ` / ${allProducts.length}`
+                     : null}
+                  )
                </span>
             </h1>
-            {/* <Link
-               href="/add-product"
-               className="flex flex-col items-center px-2 "
-            >
-               <PlusCircle size={26} className="" />
-            </Link> */}
          </div>
+
+         <div className="relative mb-4 px-1">
+            <input
+               type="text"
+               placeholder="Filtrer par nom…"
+               value={searchTerm}
+               onChange={(e) => setSearchTerm(e.target.value)}
+               className="bg-card outline-none border-none rounded-lg w-full py-2 px-4 placeholder:text-white/50 placeholder:italic placeholder:text-sm placeholder:font-light"
+               autoComplete="off"
+               spellCheck="false"
+            />
+         </div>
+
+         {filteredProducts.length === 0 && searchTerm.trim() ? (
+            <p className="px-1 text-center text-sm text-white/60">
+               Aucun produit ne correspond à « {searchTerm.trim()} ».
+            </p>
+         ) : null}
+
          {categories.map((category) => {
-            const productsInCategory = allProducts.filter(
+            const productsInCategory = filteredProducts.filter(
                (product) => product.category?.id === category.id,
             );
 
