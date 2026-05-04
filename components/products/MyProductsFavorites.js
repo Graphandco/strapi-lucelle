@@ -24,7 +24,7 @@ function renderProductsByCategory(
 
       return (
          <div key={category.id} className="my-6">
-            <h3 className="text-lg text-white font-medium mb-2">
+            <h3 className="text-sm text-bg mb-2 text-primary/50">
                {category.name}
             </h3>
             <ul className="rounded-lg px-3 pb-2">
