@@ -1,9 +1,8 @@
 "use client";
-import Image from "next/image";
 
 import { useCatalogData } from "@/hooks/useCatalogData";
 import ProductCard from "@/components/products/ProductCard";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import SearchBar from "@/components/products/SearchBar";
 import {
    Accordion,
@@ -25,8 +24,25 @@ export default function ShoppingList() {
       optimisticClearShopping,
    } = useCatalogData();
    const [isClearing, setIsClearing] = useState(false);
+   /** Mobile : après ouverture de l’accordéon « panier », faire défiler pour révéler le contenu. */
+   const cartAccordionSectionRef = useRef(null);
 
    const reconcile = useCallback(() => reload({ silent: true }), [reload]);
+
+   const handleCartAccordionChange = useCallback((value) => {
+      if (value !== "item-1") return;
+      const el = cartAccordionSectionRef.current;
+      if (!el) return;
+      requestAnimationFrame(() => {
+         window.setTimeout(() => {
+            el.scrollIntoView({
+               behavior: "smooth",
+               block: "nearest",
+               inline: "nearest",
+            });
+         }, 150);
+      });
+   }, []);
 
    const productsToBuy = allProducts.filter((product) => product.isToBuy);
    const productsNotInCart = productsToBuy.filter(
@@ -110,8 +126,15 @@ export default function ShoppingList() {
                )}
 
                {productsInCart.length > 0 && (
-                  <div>
-                     <Accordion type="single" collapsible>
+                  <div
+                     ref={cartAccordionSectionRef}
+                     className="scroll-mb-24"
+                  >
+                     <Accordion
+                        type="single"
+                        collapsible
+                        onValueChange={handleCartAccordionChange}
+                     >
                         <AccordionItem value="item-1">
                            <AccordionTrigger>
                               <div className="flex items-center gap-2">
