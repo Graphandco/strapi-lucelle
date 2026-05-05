@@ -45,7 +45,7 @@ export default function Header() {
                         height={55}
                         className="absolute left-1/2 -translate-x-1/2 translate-y-[20px]"
                      />
-                     Graph & Shop
+                     <span className="">Graph & Shop</span>
                   </Link>
 
                   <div className="flex items-center gap-4">
