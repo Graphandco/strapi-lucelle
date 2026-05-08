@@ -17,7 +17,6 @@ services:
       # Sécurité de base (Hardening)
       cpus: 0.5
       mem_limit: 512m
-      read_only: true
       security_opt:
          - no-new-privileges:true
       tmpfs:

@@ -46,7 +46,7 @@ export default function Homepage() {
                <div className="text-primary text-lg font-base">
                   Bienvenue {user?.username} !
                </div>
-               <div className="text-white text-sm">
+               <div className="text-white text-sm text-pretty">
                   {hasItems ? (
                      <div className="flex items-center justify-center gap-2">
                         <span className="text-primary text-2xl inline-block">
