@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { addProduct } from "@/actions/addProduct";
 import { getSupabaseCategories } from "@/actions/getSupabaseProduct";
 import { getMyProfileRole } from "@/actions/getMyProfileRole";
+import { useCatalogData } from "@/hooks/useCatalogData";
 import { toast } from "sonner";
 import { Upload, X } from "lucide-react";
 
@@ -21,6 +23,8 @@ function isAcceptedImage(file) {
 }
 
 export default function AddProductForm() {
+   const router = useRouter();
+   const { reload } = useCatalogData();
    const formRef = useRef(null);
    const nameInputRef = useRef(null);
    const imageInputRef = useRef(null);
@@ -156,7 +160,9 @@ export default function AddProductForm() {
             nameInputRef.current.value = "";
          }
          clearImage();
+         await reload({ silent: true });
          toast.success("Produit ajouté avec succès");
+         router.push("/my-products");
       } catch (err) {
          console.error("Erreur détaillée:", err);
          setError(err.message);

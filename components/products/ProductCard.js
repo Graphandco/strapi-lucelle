@@ -149,7 +149,7 @@ const ProductCard = ({
                   alt={product.name || "Produit sans nom"}
                   width={25}
                   height={25}
-                  className="max-h-[28px] object-contain"
+                  className="max-h-[25px] object-contain"
                />
                <span className="truncate text-white text-sm">
                   {product.name}
